@@ -4,6 +4,8 @@ A story-driven co-op survival adventure for Minecraft 1.21.1 on NeoForge, built 
 
 > Four hundred years ago, a civilisation that ran on magic-fuelled machines tried to open a bridge to other worlds and broke this one instead. You're the Remnant, descendants of the survivors, starting over with flint and fire.
 >
+> Every expedition is won before it starts. Meals that take days to ferment, brews from herbs that only grow in other realms, oils for the monster you're hunting, rations that keep on the road: preparation is how you get strong.
+>
 > Rebuild through five Ages, from stone tools to steam trains, airships and finally the old world's own reactors, by recovering lost schematics from the ruins. Rifts lead to other realms, including a full Pokémon region with its own story, where you can raise a partner who fights beside you back home.
 >
 > Your bloodline grows with you: nine lineages that awaken new abilities as the world advances. Combat is skill-based, bosses are about patterns rather than giant health bars, and death stings, but your friends can drag you back.
@@ -16,6 +18,7 @@ A story-driven co-op survival adventure for Minecraft 1.21.1 on NeoForge, built 
 
 These decide what goes into the pack and how it's tuned:
 
+- **Preparation is the game.** Power comes mostly from what you bring: meals, aged drinks, brews, blade oils and rations made from ingredients you gather across the world and its realms. Bosses and deep realms are tuned for players who arrive prepared.
 - **No number race.** Characters grow through new abilities, mobility and utility, not stacked damage percentages. Gear power is gated by the Ages.
 - **Earned progress.** Each Age opens when the group recovers a piece of the old world, not by grinding resources.
 - **Earned flight.** Mounts and machines come first. Flight is hard to get, and nothing moves faster than 75 blocks per second.
