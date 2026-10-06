@@ -1,0 +1,5 @@
+# Repo files that are not part of the game install
+README.md
+docs/
+.github/
+tools/
