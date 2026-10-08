@@ -1,0 +1,4 @@
+*.blueprint
+*.png
+tex/
+.pylib/
