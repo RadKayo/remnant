@@ -84,7 +84,11 @@ PLAN = [
     ("ruins", "Explorer's Compass", ["explorers-compass"], "explorers-compass", ""),
     ("ruins", "Xaero's Minimap", ["xaeros-minimap"], "xaeros-minimap", ""),
     ("ruins", "Xaero's World Map", ["xaeros-world-map"], "xaeros-world-map", ""),
-    ("settlement", "MineColonies", ["minecolonies"], "minecolonies", "open:town"),
+    ("settlement", "MineColonies", [], "245506", "open:town; NeoForge 1.21.1 builds are CurseForge-only"),
+    ("library", "Structurize", [], "298744", "for MineColonies"),
+    ("library", "BlockUI", [], "522992", "for MineColonies"),
+    ("library", "Domum Ornamentum", [], "527361", "for MineColonies"),
+    ("library", "Multi-Piston", [], "303278", "for MineColonies"),
     ("settlement", "Supplementaries", ["supplementaries"], "supplementaries", ""),
     ("settlement", "Waystones", ["waystones"], "waystones", ""),
     ("settlement", "Traveler's Backpack", ["travelersbackpack"], "travelers-backpack", ""),
@@ -299,7 +303,8 @@ def resolve(name, slugs, cf_slug):
             p = mr_project(hit["project_id"])
             vs = mr_versions(p["id"]) if p else []
             if vs:
-                return mr_entry(p, vs)
+                # found by search, not by its own slug: often a port or an add-on, so a person checks it
+                return {**mr_entry(p, vs), "via": "search"}
     if cf_slug:
         c = cf_lookup(cf_slug)
         if c:
@@ -315,7 +320,8 @@ def main():
         out.append(row)
         if r and r.get("id"):
             seen_ids[r["id"]] = row
-        print(f"{group:10} {name[:34]:34} {(r or {}).get('source', '-'):10} {(r or {}).get('version')}", flush=True)
+        flag = "  <- found by search, check it: " + r["title"] if r and r.get("via") == "search" else ""
+        print(f"{group:10} {name[:34]:34} {(r or {}).get('source', '-'):10} {(r or {}).get('version')}{flag}", flush=True)
     # required dependencies (Modrinth metadata), followed transitively
     queue = [d for row in out for d in row.get("deps", []) if d["type"] == "required"]
     while queue:
