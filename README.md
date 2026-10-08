@@ -59,6 +59,7 @@ Players install the pack once in Prism Launcher, and it updates itself on every 
 | `config/`, `defaultconfigs/` | Mod configuration shipped with the pack |
 | `kubejs/` | Scripts for the custom systems: the stone-age start, Ages and schematics, waystone rebuilding, Remmings and more |
 | `docs/` | Player and maintainer notes (not shipped to clients) |
+| `tools/compat/` | The compatibility audit: resolves the mod plan, checks dependencies and mixin overlaps (not shipped) |
 
 ## Maintaining
 
@@ -72,3 +73,8 @@ packwiz refresh                 # rebuild index.toml after editing files by hand
 ```
 
 Commit `index.toml` together with whatever changed, or clients will reject the update. Every change is tested on the test server before it reaches players.
+
+Before adding or updating mods, run the audit in [`tools/compat`](tools/compat/README.md). Two packwiz rules came out of it:
+
+- Some libraries are marked server-only on Modrinth but are needed on clients (SmartBrainLib, CodxLib, Lithostitched, Structure Pool API). Set `side = "both"` in their `.pw.toml`, or players crash on launch.
+- Distant Horizons is pinned to 3.3.2 with its built-in updater turned off, until its Chunky crash is fixed.
