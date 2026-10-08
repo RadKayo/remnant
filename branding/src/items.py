@@ -461,7 +461,7 @@ def presidential_pants():
 ITEMS = [
     ("flint_shard", "Flint Shard", "Age I: knapped from gravel", flint_shard),
     ("flint_hatchet", "Flint Hatchet", "Age I: the first axe", flint_hatchet),
-    ("hearthstone", "Hearthstone", "Once-a-day home recall", hearthstone),
+    ("hearthstone", "Hearthstone", "Hourly home recall, bound at a hearth", hearthstone),
     ("relay_kit", "Relay Kit", "Rebuilds a ruined waystone", relay_kit),
     ("salvaged_circuitry", "Salvaged Circuitry", "Relay Kit part, from ruins", salvaged_circuitry),
     ("gearwright_schematic", "Gearwright Schematic", "Opens the Age of Steam", gearwright_schematic),

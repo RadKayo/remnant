@@ -88,7 +88,7 @@ PLAN = [
     ("settlement", "MineColonies", ["minecolonies"], "minecolonies", "open:town"),
     ("settlement", "Supplementaries", ["supplementaries"], "supplementaries", ""),
     ("settlement", "Waystones", ["waystones"], "waystones", ""),
-    ("settlement", "Sophisticated Backpacks", ["sophisticated-backpacks"], "sophisticated-backpacks", ""),
+    ("settlement", "Traveler's Backpack", ["travelersbackpack"], "travelers-backpack", ""),
     ("settlement", "Sophisticated Storage", ["sophisticated-storage"], "sophisticated-storage", ""),
     ("settlement", "Carry On", ["carry-on"], "carry-on", ""),
     ("travel", "Horseman", ["horseman"], None, ""),
