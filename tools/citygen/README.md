@@ -8,12 +8,16 @@ What it builds, centred on the Hearth. The Ascendancy was a high-tech aether civ
 - **Streets:** four avenues to four gates, a ring road and diagonal lanes, with violet conduit lines down their middles, light pylons along the avenues, and an elevated monorail on quartz pillars over the ring road, partly fallen.
 - **Habitation towers:** round quartz shafts that taper as they rise, with thin iron ribs, ribbon windows of violet or clear glass, white ledges, glass-railed balconies, a conduit seam, a glass dome with a copper halo, and an antenna.
 - **Terraced halls:** tiers stepping back from the street, each with a full-height glass front under a thin overhanging roof plate, chamfered corners, ribbon windows, planted terraces and a roof garden.
-- **The Convergence Spire:** an octagonal tower with an amethyst aether core. The great copper ring is threaded through it and broken away, and the missing arc lies in two pieces nearby.
+- **The Convergence Spire:** an octagonal quartz shaft ribbed in iron, tapering into an open crystal lantern and a needle, with an aether core up its middle. The great copper ring stands around it.
+- **The Twin Arcology:** two fourteen-storey towers joined by three glass sky bridges. Sky bridges also link street towers that line up.
+- **The Archive:** a rotunda in a quartz colonnade under a violet glass dome, with shelves around an aether crystal. Restored, it teaches the runes.
 - **The market:** a quartz colonnade with an iron architrave under a glass canopy, around a fountain.
 - **The Grave Warden's mausoleum:** a crypt below it, and a graveyard above.
 - **The mooring mast** for the Age of Steam airships.
 - **The outer wall:** dark tile with quartz bands and its own aether line. A great copper ring is set into each gatehouse, and the corner towers carry ward pylons, quartz obelisks crowned with aether crystal.
 - **Free plots** for anyone to build on.
+
+The generator builds the city whole first, then breaks it. **The Sundering** shatters the Spire's crown, snaps its ring (the missing arc falls in two pieces east of it) and breaches the outer wall. Then **time** does the rest.
 
 Decay comes from noise. Ground floors mostly stand while roofs and upper floors mostly don't. Landmarks and towers break in large clean collapses, and houses take smaller holes. Rubble piles up where blocks fell, and anything cut loose from the ground is dropped. Quartz weathers to calcite and iron rusts. Grass, moss, vines, glow lichen and a few trees grow over it.
 
@@ -43,6 +47,9 @@ Every site is built from the same design as the ruin:
   - Age V restores the original, and the dead aether conduits glow again (pearlescent froglight).
   - Salvaged metal and glass go back as they were.
 - Rubble, vines and moss are cleared, while grass and flowers stay.
+- Debris left by the Sundering (the fallen ring pieces, rubble from the breaches) is cleared from a site when it's restored.
+- Beyond the landmarks and houses, the streets (`aether_grid`, Age V), the four wall sectors (`wall_ne` and so on, Age III), the `monorail` (Age III), the `arcology` (Age IV), the `archive` (Age IV) and the `spire` (Age V, the finale) are sites too. Restored in Age V, every conduit in a site glows (pearlescent froglight).
+- `datapack/data/remnant/structure/core_final/` holds the whole city as it stands with every site restored in Age V. It's a preview for us, not for the pack.
 - Landmarks add their own touches: the Hearth's brazier is lit, the gates get torches and banners, and the market gets a bell for the townsfolk to gather at.
 
 Only blocks inside the site change. Each restoration is written for all five Ages as structure templates, three layers high for landmarks and four for houses. A function places them one after another with dust and sound, summons any residents, and announces it to everyone.

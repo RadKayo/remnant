@@ -138,6 +138,7 @@ class City:
         self.sites = {}  # what the group restores: landmarks and houses, each with a footprint
         self.free_plots = 0
         self.trade_deck = []
+        self.towers = []
         s = self.g.s
         self.m = {
             # the Ascendancy's city: cream limestone, grey tuff, verdigris copper, aether crystal
@@ -255,8 +256,12 @@ class City:
         junk = mask & (self.pre_a == AIR) & (g.a > AIR) & ~g.keep & ~np.isin(g.a, plants)
         junk[:, :G, :] = False
         new[junk] = AIR
+        deb = mask & self.debris
+        new[deb] = self.pre_a[deb]
         if site["props"]:
             site["props"](new, age)
+        if age >= 5:  # the aether flows again
+            new[mask & (new == self.m["aether"])] = self.m["aether_lit"]
         return new
 
     def props_hearth(self, new, age):
@@ -352,6 +357,7 @@ class City:
         for o in (-1, 1):
             self.put(px + ddx + tx * o, G + 2, pz + ddz + tz * o, s("end_rod", facing=door))
         r2 = int(math.ceil(rad)) + 3
+        self.towers.append(dict(cx=cx, cz=cz, rad=rad, floors=floors))
         self.claim(cx - r2, cz - r2, cx + r2, cz + r2, integrity, y)
         self.fine[R + cx - r2:R + cx + r2 + 1, R + cz - r2:R + cz + r2 + 1] = 0.12
         cells = [(int(a) - R, int(b) - R) for a, b in zip(*np.nonzero(base_inside))]
@@ -447,7 +453,7 @@ class City:
             info = self.hab_tower((x0 + x1) // 2, (z0 + z1) // 2, rad, int(self.rng.integers(4, 9)), door, integrity)
         else:
             deep = d if door in ("north", "south") else w
-            info = self.terrace(x0, z0, x1, z1, door, 3 if deep >= 10 else 2, integrity)
+            info = self.terrace(x0, z0, x1, z1, door, 3 if deep >= 10 else 2 if deep >= 7 else 1, integrity)
         if not self.trade_deck:
             self.trade_deck = [TRADE_NAMES[int(i)] for i in self.rng.permutation(len(TRADE_NAMES))]
         trade = self.trade_deck.pop()
@@ -522,10 +528,120 @@ class City:
                                                                               waterlogged=False))
                 elif self.wget(new, cx, y + 1, cz) > AIR and (cx, cz) not in used:
                     self.wput(new, cx, y, cz, s("lantern", hanging=True, waterlogged=False))
-            if age >= 5:  # the aether flows again
-                sub = new[:, G:h["top"] + 1, :]
-                sub[(sub == self.m["aether"]) & np.broadcast_to(h["mask"][:, None, :], sub.shape)] = self.m["aether_lit"]
         return props
+
+    # ---------- megastructures ----------
+    def tube(self, a0, a1, c, y, axis):
+        """A sky bridge: an iron-floored glass tube three wide with iron frames and a quartz roof,
+        running along x (axis "x", c = z) or z (axis "z", c = x) from a0 to a1 at floor height y."""
+        m = self.m
+        lo, hi = min(a0, a1), max(a0, a1)
+        for a in range(lo, hi + 1):
+            frame = (a - lo) % 3 == 0
+            for o in (-1, 0, 1):
+                x, z = (a, c + o) if axis == "x" else (c + o, a)
+                self.put(x, y, z, m["iron"])
+                self.put(x, y + 4, z, self.slab("smooth_quartz", "top") if not frame else m["iron"])
+                for yy in (y + 1, y + 2, y + 3):
+                    self.put(x, yy, z, AIR, built=False)
+            for o in (-2, 2):
+                x, z = (a, c + o) if axis == "x" else (c + o, a)
+                self.put(x, y, z, self.slab("smooth_quartz", "top"))
+                for yy in (y + 1, y + 2, y + 3):
+                    self.put(x, yy, z, m["iron"] if frame else m["glass_w"])
+                self.put(x, y + 4, z, m["iron"])
+
+    def arcology(self):
+        """The Twin Arcology: two fourteen-storey habitation towers either side of the south-west lane,
+        joined by three sky bridges."""
+        a, b, z, rad, floors = (-56, -32), None, 44, 6.5, 14
+        ia = self.hab_tower(-56, z, rad, floors, "east", 0.8)
+        ib = self.hab_tower(-32, z, rad, floors, "west", 0.8)
+        for k in (4, 8, 12):
+            y = G + 4 * k
+            self.tube(-56 + int(rad), -32 - int(rad), z, y, "x")
+        self.claim(-66, 34, -22, 54, 0.8, G + 64)
+        self.fine[R - 66:R - 21, R + 34:R + 55] = 0.15
+        self.site("arcology", "The Twin Arcology", 4, self.rect(-66, 34, -22, 54), self.props_lit([ia, ib]),
+                  layer=4, summon=[(-56, G, z, "none"), (-32, G, z, "none"), (-56, G + 17, z, "none"),
+                                   (-32, G + 17, z, "none")])
+
+    def archive(self):
+        """The Archive: a rotunda ringed by a quartz peristyle under a great violet glass dome, an aether crystal
+        at its heart and shelves of the Ascendancy's books around it. Restored, it teaches the runes."""
+        m, s = self.m, self.g.s
+        cx, cz = 28, 62
+        lx, lz = self.dx - cx, self.dz - cz
+        d = np.hypot(lx, lz)
+        ang = np.degrees(np.arctan2(lz, lx))
+        self.g.column_mask(d <= 12.5, G, G, m["ds_pol"])
+        self.g.column_mask((d > 12.5) & (d <= 13.5), G, G, self.slab("polished_deepslate"))
+        self.g.column_mask(d <= 7.5, G, G, m["qz_b"])
+        for a in range(0, 360, 24):
+            px, pz = cx + int(round(11 * math.cos(math.radians(a)))), cz + int(round(11 * math.sin(math.radians(a))))
+            self.box(px, G + 1, pz, px, G + 8, pz, m["qz_p"])
+            self.put(px, G + 9, pz, m["qz_ch"])
+        self.g.column_mask((d > 10.3) & (d <= 11.8), G + 10, G + 10, m["iron"])
+        self.g.column_mask((d > 10.3) & (d <= 12.2), G + 11, G + 11, self.slab("smooth_quartz"))
+        drum = (d > 7.5) & (d <= 8.5)
+        slit = drum & (np.abs(((ang + 15) % 30) - 15) < 4)
+        self.g.column_mask(drum, G + 1, G + 12, m["qz_b"])
+        self.g.column_mask(slit, G + 2, G + 8, m["glass_v"])
+        self.g.column_mask(drum & (np.abs(lx) <= 1) & (lz < 0), G + 1, G + 4, AIR, built=False)
+        for t in range(0, 10):
+            rr = math.sqrt(max(8.5 ** 2 - (t + 0.4) ** 2, 0))
+            layer = (d <= rr + 0.4) & (d > rr - 1.2)
+            if not layer.any():
+                break
+            rib = layer & (np.abs(((ang + 22.5) % 45) - 22.5) < math.degrees(0.6 / max(rr, 1)))
+            self.g.column_mask(layer & ~rib, G + 13 + t, G + 13 + t, m["glass_vb"])
+            self.g.column_mask(rib, G + 13 + t, G + 13 + t, m["iron"])
+        self.box(cx, G + 1, cz, cx, G + 2, cz, m["qz_ch"])
+        self.box(cx, G + 3, cz, cx, G + 4, cz, m["aether"])
+        self.put(cx, G + 5, cz, s("amethyst_cluster", facing="up", waterlogged=False))
+        shelves = (d > 5.5) & (d <= 6.5) & (np.abs(((ang + 15) % 30) - 15) > 6)
+        self.g.column_mask(shelves, G + 1, G + 3, s("bookshelf"))
+        self.claim(cx - 14, cz - 14, cx + 14, cz + 14, 0.7, G + 22)
+        self.fine[R + cx - 14:R + cx + 15, R + cz - 14:R + cz + 15] = 0.15
+        self.sign(cx, G + 5, cz - 9, "north", ["THE ARCHIVE", "", "WHAT WE KNEW"])
+        info = dict(cx=cx, cz=cz, floors=3, top=G + 12)
+        self.site("archive", "The Archive", 4, self.rect(cx - 14, cz - 14, cx + 14, cz + 14), self.props_lit([info]),
+                  summon=[(cx + 3, G + 1, cz, "librarian"), (cx - 3, G + 1, cz, "librarian")])
+
+    def props_lit(self, infos):
+        def props(new, age):
+            """Lanterns under every ceiling."""
+            for h in infos:
+                for k in range(h["floors"]):
+                    y = G + 4 * k + 3
+                    if self.wget(new, h["cx"], y + 1, h["cz"]) > AIR:
+                        self.wput(new, h["cx"], y, h["cz"], self.g.s("lantern", hanging=True, waterlogged=False))
+        return props
+
+    def sky_bridges(self):
+        """Glass sky bridges between towers that line up along a street, about two thirds of the way up."""
+        n = 0
+        for i, a in enumerate(self.towers):
+            for b in self.towers[i + 1:]:
+                for axis, along, across in (("x", 0, 1), ("z", 1, 0)):
+                    pa, pb = (a["cx"], a["cz"]), (b["cx"], b["cz"])
+                    if abs(pa[across] - pb[across]) > 2 or not 10 <= abs(pa[along] - pb[along]) <= 34:
+                        continue
+                    k = max(1, min(a["floors"], b["floors"]) * 2 // 3)
+                    y = G + 4 * k
+                    lo, hi = sorted((pa[along], pb[along]))
+                    lo, hi = lo + int(a["rad"]), hi - int(b["rad"])
+                    c = (pa[across] + pb[across]) // 2
+                    if hi - lo < 4:
+                        continue
+                    span = self.g.a[R + lo + 3:R + hi - 2, y:y + 5, R + c - 2:R + c + 3] if axis == "x" else \
+                        self.g.a[R + c - 2:R + c + 3, y:y + 5, R + lo + 3:R + hi - 2]
+                    if (span > AIR).any():
+                        self.notes.append(f"bridge {pa}-{pb} blocked")
+                        continue
+                    self.tube(lo, hi, c, y, axis)
+                    n += 1
+        self.notes.append(f"{n} sky bridges")
 
     # ---------- streets of the old city ----------
     def conduits(self):
@@ -534,10 +650,24 @@ class City:
         m, dx, dz, r, rng = self.m, self.dx, self.dz, self.r, self.rng
         dash = (np.floor(r).astype(int) % 3) != 0
         line = (((dx == 0) | (dz == 0)) & (r >= 7) & (r <= 82) & dash) | ((np.abs(r - 40.25) < 0.5) & dash)
-        broken = rng.random(dx.shape) < 0.25
+        self.conduit_line = line
         g = self.g.a[:, G - 1, :]
-        g[line & ~broken] = m["aether"]
-        g[line & broken] = m["gravel"]
+        g[line] = m["aether"]
+        grid = dilate(self.roads, 1) | (self.r <= 19.5) | line
+        self.site("aether_grid", "The Aether Grid", 5, grid, self.props_grid)
+
+    def props_grid(self, new, age):
+        """The streets made whole: paving relaid where the weeds took it, the conduits mended, and the weeds
+        on the streets pulled up. (In Age V, restore() also lights every conduit.)"""
+        mask = self.sites["aether_grid"]["mask"] & (self.roads | self.conduit_line)
+        ground = new[:, G - 1, :]
+        ground[mask] = self.pre_a[:, G - 1, :][mask]
+        weeds = self.g.ids_where(lambda k: any(p in k for p in ("short_grass", "tall_grass", "fern", "poppy",
+                                                                 "dandelion", "daisy", "cornflower", "bluet",
+                                                                 "moss_carpet")))
+        for y in (G, G + 1):
+            layer = new[:, y, :]
+            layer[mask & np.isin(layer, weeds)] = AIR
 
     def pylons(self):
         """Light pylons along the avenues: dark posts with a glowing rod."""
@@ -560,6 +690,7 @@ class City:
         self.integrity[beam] = 0.9
         self.htop[beam] = G + 40  # decay it as the low part of something tall: whole spans survive or fall
         self.fine[beam] = 0.1
+        self.site("monorail", "The Monorail", 3, np.abs(self.r - 40.25) <= 1.6)
         for a in range(0, 360, 9):
             if any(abs(((a - g + 180) % 360) - 180) < 8 for g in (0, 90, 180, 270, 45, 135, 225, 315)):
                 continue
@@ -665,19 +796,27 @@ class City:
         self.roads = ns | ew | ring | lanes
         n = noise2(dx.shape, 9, rng)
         speck = rng.random(dx.shape)
-        lane_mix = np.choose(rng.integers(0, 3, dx.shape), [m["cobble"], m["tuff"], m["gravel"]])
+        lane_mix = np.choose(rng.integers(0, 3, dx.shape), [m["ds_t"], m["ds_cob"], m["ds_pol"]])
         g = self.g.a[:, G - 1, :]
         g[lanes] = lane_mix[lanes]
-        self.ground(ring, m["tuff_b"])
-        self.ground(ns | ew, m["tuff_pol"])
+        self.ground(ring, m["ds_t"])
+        self.ground(ns | ew, m["ds_pol"])
         curb = (ns & (np.abs(dx) == 3)) | (ew & (np.abs(dz) == 3))
-        self.ground(curb & ~(ns & ew), m["tuff_b"])
-        # four centuries of weeds
-        worn = self.roads & (n > 0.62)
+        self.ground(curb & ~(ns & ew), m["qz"])
+
+    def wear_streets(self):
+        """Four centuries of weeds on the streets, and the conduits cracked."""
+        m, dx, rng = self.m, self.dx, self.rng
+        n = noise2(dx.shape, 9, rng)
+        speck = rng.random(dx.shape)
+        worn = self.roads & (n > 0.62) & ~self.g.keep[:, G - 1, :]
         self.ground(worn & (speck < 0.7), m["grass"])
         self.ground(worn & (speck >= 0.7), m["coarse"])
-        self.ground(self.roads & (n > 0.55) & (n <= 0.62) & (speck < 0.5), m["gravel"])
-        self.ground(self.roads & (speck > 0.985), m["moss"])
+        self.ground(self.roads & (n > 0.55) & (n <= 0.62) & (speck < 0.5) & ~self.g.keep[:, G - 1, :], m["gravel"])
+        self.ground(self.roads & (speck > 0.985) & ~self.g.keep[:, G - 1, :], m["moss"])
+        g = self.g.a[:, G - 1, :]
+        broken = self.conduit_line & (rng.random(dx.shape) < 0.25) & ~self.g.keep[:, G - 1, :]
+        g[broken] = m["gravel"]
 
     # ---------- the plaza and the Hearth ----------
     def plaza(self):
@@ -685,29 +824,29 @@ class City:
         pz = r <= 18.5
         rings = (r.astype(int) // 3) % 2 == 0
         spokes = (((th + 180) / 22.5).astype(int) % 2) == 0
-        pave = np.where(rings, m["lime_pol"], np.where(spokes, m["lime_cut"], m["lime_small"]))
+        pave = np.where(rings, m["qz_b"], np.where(spokes, m["qz"], m["calcite"]))
         lines = (np.abs(r - 12.5) < 0.5) | (np.abs(r - 18) < 0.5)
         spoke = (r > 7) & ((np.abs(dx) <= 0.5) | (np.abs(dz) <= 0.5) | (np.abs(np.abs(dx) - np.abs(dz)) <= 0.5))
-        pave = np.where(lines, m["tuff_b"], np.where(spoke, m["tuff_pol"], pave))
+        pave = np.where(lines, m["ds_pol"], np.where(spoke, m["ds_t"], pave))
         g = self.g.a[:, G - 1, :]
         g[pz] = pave[pz]
         self.g.keep[:, G - 1, :] |= pz
         edge = (r > 18.5) & (r <= 19.5)
         gap = (np.abs(dx) <= 3) | (np.abs(dz) <= 3) | (np.abs(np.abs(dx) - np.abs(dz)) <= 2)
-        self.g.a[:, G, :][edge & ~gap] = self.slab("create:cut_limestone")
+        self.g.a[:, G, :][edge & ~gap] = self.slab("smooth_quartz")
         self.g.built[:, G, :][edge & ~gap] = True
         self.g.keep[:, G, :][edge & ~gap] = True
-        self.ground(edge, m["lime_pol"])
+        self.ground(edge, m["ds_pol"])
         self.claim(-22, -22, 22, 22, 1.0)
 
         # the Hearth: a sunken fire ring with an unlit brazier the Remnant rekindle
         pit = r <= 5.5
         rim = (r > 5.5) & (r <= 7)
         self.g.column_mask(pit, G - 1, G - 1, AIR, built=False)
-        self.g.column_mask(pit, G - 2, G - 2, m["tuff_pol"], built=False)
-        self.ground(rim, m["tuff_ch"])
+        self.g.column_mask(pit, G - 2, G - 2, m["ds_pol"], built=False)
+        self.ground(rim, m["qz_ch"])
         self.g.keep[:, G - 2:G + 1, :] |= (r <= 7)[:, None, :]
-        self.box(-1, G - 2, -1, 1, G - 1, 1, m["tuff_chis"], keep=True)
+        self.box(-1, G - 2, -1, 1, G - 1, 1, m["ds_ch"], keep=True)
         for d, (ox, oz) in DIRS.items():
             self.put(ox, G, oz, self.stairs("oxidized_cut_copper", d), keep=True)
         for ox in (-1, 1):
@@ -723,28 +862,30 @@ class City:
             for z in range(-10, 11):
                 rr = math.hypot(x, z)
                 if 8.5 <= rr < 9.5 and abs(x) > 3 and abs(z) > 3:
-                    self.put(x, G, z, self.stairs("create:cut_limestone", toward(x, z)), keep=True)
+                    self.put(x, G, z, self.stairs("smooth_quartz", toward(x, z)), keep=True)
         for sx in (-1, 1):
             for sz in (-1, 1):
-                self.box(8 * sx, G, 8 * sz, 8 * sx, G + 2, 8 * sz, self.wall("polished_tuff"), keep=True)
+                self.box(8 * sx, G, 8 * sz, 8 * sx, G + 2, 8 * sz, self.wall("polished_deepslate"), keep=True)
                 self.put(8 * sx, G + 3, 8 * sz, m["bulb"], keep=True)
 
     # ---------- buildings ----------
     def house(self, x0, z0, x1, z1, floors, door, integrity, roof="flat", wall=None, keep=False):
+        """A plain box house. Only the Elder's house and the Storehouse use it now: Ascendancy shells in quartz
+        and iron that the Remnant patched with timber."""
         m, s = self.m, self.g.s
-        wall = wall or m["lime"]
+        wall = wall or m["qz_b"]
         h = floors * 4
         self.box(x0, G, z0, x1, G + h, z1, wall, keep=keep)
         self.box(x0 + 1, G, z0 + 1, x1 - 1, G + h - 1, z1 - 1, AIR, built=False)
         self.box(x0 + 1, G - 1, z0 + 1, x1 - 1, G - 1, z1 - 1, m["lime_pol"], built=False, keep=keep)
         # base course, floor bands, corners
-        for y, st in ((G, m["tuff_pol"]),) + tuple((G + 4 * k, m["cu"]) for k in range(1, floors + 1)):
+        for y, st in ((G, m["ds_pol"]),) + tuple((G + 4 * k, m["iron"]) for k in range(1, floors + 1)):
             self.box(x0, y, z0, x1, y, z0, st, keep=keep)
             self.box(x0, y, z1, x1, y, z1, st, keep=keep)
             self.box(x0, y, z0, x0, y, z1, st, keep=keep)
             self.box(x1, y, z0, x1, y, z1, st, keep=keep)
         for cx, cz in ((x0, z0), (x0, z1), (x1, z0), (x1, z1)):
-            self.box(cx, G + 1, cz, cx, G + h - 1, cz, m["lime_pol"], keep=keep)
+            self.box(cx, G + 1, cz, cx, G + h - 1, cz, m["qz_p"], keep=keep)
         for k in range(1, floors):
             self.box(x0 + 1, G + 4 * k, z0 + 1, x1 - 1, G + 4 * k, z1 - 1, m["lime_cut"], keep=keep)
         # windows on every floor, a door facing the street
@@ -780,7 +921,7 @@ class City:
         if roof == "flat":
             self.box(x0 + 1, top, z0 + 1, x1 - 1, top, z1 - 1, m["lime_cut"], keep=keep)
             for (ax, az, bx, bz) in ((x0, z0, x1, z0), (x0, z1, x1, z1), (x0, z0, x0, z1), (x1, z0, x1, z1)):
-                self.box(ax, top + 1, az, bx, top + 1, bz, self.wall("create:cut_limestone"), keep=keep)
+                self.box(ax, top + 1, az, bx, top + 1, bz, self.slab("smooth_quartz"), keep=keep)
         elif roof == "copper":
             self.hip_roof(x0 - 1, z0 - 1, x1 + 1, z1 + 1, top + 1, "oxidized_cut_copper", m["cu"], keep)
             top += min(x1 - x0, z1 - z0) // 2 + 1
@@ -810,7 +951,7 @@ class City:
                 self.loot(x, G, z, "decorated_pot", s("decorated_pot", facing="north", cracked=bool(rng.random() < .5),
                                                      waterlogged=False))
             elif roll < 0.82:
-                self.put(x, G, z, self.slab("create:polished_cut_limestone", "top"), built=False)
+                self.put(x, G, z, self.slab("smooth_quartz", "top"), built=False)
             else:
                 self.put(x, G, z, s("cauldron"), built=False)
 
@@ -905,7 +1046,7 @@ class City:
         m, s = self.m, self.g.s
         x0, z0, x1, z1 = 21, -18, 33, -8
         self.house(x0, z0, x1, z1, 1, "south", 1.0, roof=None, keep=True)
-        self.box(x0 + 1, G + 1, z0, x1 - 1, G + 2, z0, m["lime"], keep=True)  # no windows behind the screens
+        self.box(x0 + 1, G + 1, z0, x1 - 1, G + 2, z0, m["qz_b"], keep=True)  # no windows behind the screens
         self.box(x0 + 3, G, z1, x1 - 3, G + 2, z1, AIR, built=False)  # wide loading front
         self.gable_roof(x0, z0, x1, z1, G + 5)
         for i, bx in enumerate((x0 + 1, x0 + 5, x0 + 9)):
@@ -969,87 +1110,114 @@ class City:
 
     # ---------- the Convergence Spire and its broken ring ----------
     def spire(self):
+        """The Convergence Spire as it stood: an octagonal quartz shaft ribbed in dark iron, violet glass slits,
+        a ledge every twelve blocks, tapering into an open lantern of quartz posts around a great aether crystal,
+        and a needle above. The ring stands around it whole; the catastrophe breaks both later."""
         m, s, rng = self.m, self.g.s, self.rng
         cx, cz = 0, -58
+        self.spire_c = (cx, cz)
         lx, lz = self.dx - cx, self.dz - cz
         lr = np.maximum(np.maximum(np.abs(lx), np.abs(lz)), (np.abs(lx) + np.abs(lz)) / 1.4142)  # octagon
         precinct = (np.hypot(lx, lz) <= 24) & (self.r <= 80)
-        n = noise2(lx.shape, 5, rng)
+        ring_pat = (np.hypot(lx, lz).astype(int) % 4 == 0)
+        spoke = (np.abs(lx) <= 0.5) | (np.abs(lz) <= 0.5) | (np.abs(np.abs(lx) - np.abs(lz)) <= 0.5)
         g = self.g.a[:, G - 1, :]
-        g[precinct] = np.where(n > 0.55, m["tuff_b"], np.where(n > 0.4, m["lime_pol"], m["lime_cut"]))[precinct]
-        # stepped plinth, then the octagonal shaft
-        for y, rad in ((G, 11), (G + 1, 10.4), (G + 2, 10)):
-            ring = lr <= rad
-            self.g.column_mask(ring, y, y, m["tuff_pol"] if y < G + 2 else m["tuff_b"])
-        shaft = lr <= 8
-        hollow = lr <= 5.6
-        top = G + 54 + (noise2(lx.shape, 3, rng) * 22).astype(int)  # jagged broken crown
-        for y in range(G + 3, G + 77):
-            layer = shaft & ~hollow & (top >= y)
-            if not layer.any():
-                continue
-            st = m["cu"] if (y - G) % 12 == 0 else m["lime"]
-            self.g.a[:, y, :][layer] = st
-            self.g.built[:, y, :][layer] = True
-            corner = layer & (np.abs(np.abs(lx) - np.abs(lz)) <= 0.5) & (lr > 7)
-            self.g.a[:, y, :][corner & ((y - G) % 12 != 0)] = m["lime_pol"]
-            if (y - G) % 12 == 0:
-                floor = hollow & (top >= y) & (lr > 2.5)
-                self.g.a[:, y, :][floor] = m["lime_pol"]
-                self.g.built[:, y, :][floor] = True
-            if (y - G) % 12 in (5, 6, 7, 8):  # tall slits on the eight faces
-                face = layer & ((np.abs(lx) == 0) | (np.abs(lz) == 0) | (np.abs(lx) == np.abs(lz)))
-                self.g.a[:, y, :][face] = AIR
-        # the aether core: an amethyst column caged in copper up the middle
-        for y in range(G, G + 70):
+        g[precinct] = np.where(spoke, m["aether"], np.where(ring_pat, m["ds_pol"], m["qz_b"]))[precinct]
+        for y, rad, st in ((G, 11.5, m["ds_pol"]), (G + 1, 10.8, m["qz"]), (G + 2, 10.2, m["ds_pol"])):
+            self.g.column_mask(lr <= rad, y, y, st)
+        corner = (np.abs(np.abs(lx) - np.abs(lz)) <= 0.5)
+        face = (lx == 0) | (lz == 0) | (np.abs(lx) == np.abs(lz))
+        glass = s("purple_stained_glass_pane", north=False, east=False, south=False, west=False, waterlogged=False)
+        for y in range(G + 3, G + 71):
+            t = max(0, y - (G + 58)) * 0.22
+            rad = 8 - t
+            shaft = (lr <= rad) & (lr > rad - 2.4)
+            k = (y - G) % 12
+            self.g.column_mask(shaft, y, y, m["iron"] if k == 0 else m["qz"])
+            self.g.column_mask(shaft & corner & (lr > rad - 1) & (k != 0), y, y, m["iron"])
+            if k == 0:
+                self.g.column_mask((lr <= rad - 2.4) & (lr > 2.5), y, y, m["qz_b"])
+                self.g.column_mask((lr > rad) & (lr <= rad + 1.2), y, y, self.slab("smooth_quartz", "top"))
+            if k in (4, 5, 6, 7, 8):
+                self.g.column_mask(shaft & face & ~corner, y, y, glass)
+        # the lantern crown and the needle
+        top = G + 71
+        posts = [(int(round(4.6 * math.cos(math.radians(a)))), int(round(4.6 * math.sin(math.radians(a)))))
+                 for a in range(0, 360, 45)]
+        self.g.column_mask(lr <= 5.4, top, top, m["iron"])
+        for px, pz in posts:
+            self.box(cx + px, top + 1, cz + pz, cx + px, top + 6, cz + pz, m["qz_p"])
+        self.g.column_mask(lr <= 5.4, top + 7, top + 7, m["iron"])
+        self.g.column_mask(lr <= 3.6, top + 8, top + 8, m["qz"])
+        self.box(cx - 1, top + 1, cz - 1, cx + 1, top + 5, cz + 1, m["aether"])
+        for o in ((2, 0, "east"), (-2, 0, "west"), (0, 2, "south"), (0, -2, "north")):
+            for y in (top + 2, top + 4):
+                self.put(cx + o[0], y, cz + o[1], s("amethyst_cluster", facing=o[2], waterlogged=False))
+        self.box(cx, top + 9, cz, cx, top + 11, cz, m["qz_p"])
+        self.box(cx, top + 12, cz, cx, top + 13, cz, m["iron"])
+        self.box(cx, top + 14, cz, cx, top + 15, cz, m["rod"])
+        # the aether core: an amethyst column caged in iron up the middle
+        for y in range(G, top):
             for x in (-1, 0, 1):
                 for z in (-1, 0, 1):
-                    st = m["amethyst"] if (x == 0 and z == 0) or (y % 6 in (0, 1)) else m["grate"]
+                    st = m["aether"] if (x == 0 and z == 0) else m["iron"] if y % 6 in (0, 1) else m["bars"]
                     if y < G + 3 or (x, z) == (0, 0) or y % 3 == 0:
                         self.put(cx + x, y, cz + z, st)
-        # buttresses on the diagonals
+        # buttresses on the diagonals: quartz fins capped in iron
         for sx in (-1, 1):
             for sz in (-1, 1):
                 for k in range(0, 9):
                     hgt = G + 30 - k * 3
                     bx, bz = cx + sx * (6 + k), cz + sz * (6 + k)
-                    self.box(bx, G, bz, bx, hgt, bz, m["lime"])
-                    self.put(bx, hgt + 1, bz, self.slab("create:cut_limestone_brick"))
+                    self.box(bx, G, bz, bx, hgt, bz, m["qz"])
+                    self.put(bx, hgt + 1, bz, self.slab("polished_deepslate"))
         door = (np.abs(lx) <= 1) & (lz >= 6) & (lz <= 11)
         self.g.column_mask(door, G, G + 4, AIR, built=False)
         self.sign(cx, G + 5, cz + 9, "south", ["CONVERGENCE", "SPIRE", "", "NO ENTRY"])
-        self.ring_standing(cx, cz)
-        self.ring_fallen(cx, cz)
-        self.claim(-26, -84, 44, -32, 0.8, G + 76)
+        self.ring_whole(cx, cz)
+        self.claim(-26, -84, 44, -32, 0.8, G + 86)
         self.fine[R - 26:R + 45, R - 84:R - 31] = 0.12
+        self.site("spire", "The Convergence Spire", 5, self.rect(-26, -84, 44, -32), self.props_spire)
+
+    def props_spire(self, new, age):
+        """Restored, the Spire's crystal lantern burns."""
+        if age >= 5:
+            cx, cz = self.spire_c
+            for y in range(G + 72, G + 77):
+                for x in (-1, 0, 1):
+                    for z in (-1, 0, 1):
+                        self.wput(new, cx + x, y, cz + z, self.m["aether_lit"])
 
     def ring_points(self, theta0, theta1, radius, step=0.004):
         th = np.arange(math.radians(theta0), math.radians(theta1), step)
         return th, radius * np.cos(th), radius * np.sin(th)
 
-    def ring_standing(self, cx, cz):
-        """The Convergence ring, threaded through the spire, broken away at the upper right."""
+    RING = (56, 21.0)  # centre height above G, radius
+
+    def ring_cells(self, cx, cz, t0, t1):
+        """Every cell of the Convergence ring between two angles: copper, aether crystal on the inner face,
+        chiseled nodes every fifteen degrees."""
         m = self.m
-        cy, rad = G + 56, 21.0
-        th, u, v = self.ring_points(100, 330, rad)
+        cyo, rad = self.RING
+        th, u, v = self.ring_points(t0, t1, rad)
+        cells = {}
         for t, a, b in zip(th, u, v):
             for dr in (-1.0, 0.0, 1.0):
-                x = cx + a * (rad + dr) / rad
-                y = cy + b * (rad + dr) / rad
+                x = int(round(cx + a * (rad + dr) / rad))
+                y = int(round(G + cyo + b * (rad + dr) / rad))
                 for z in (cz - 1, cz, cz + 1):
-                    st = m["amethyst"] if dr < 0 and z == cz else m["cu"]
+                    st = m["aether"] if dr < 0 and z == cz else m["cu"]
                     if int(math.degrees(t)) % 15 == 0:
                         st = m["cu_ch"]
-                    self.put(int(round(x)), int(round(y)), z, st, keep=True)
-        # jagged ends
-        for t in (100, 330):
-            a, b = rad * math.cos(math.radians(t)), rad * math.sin(math.radians(t))
-            for _ in range(6):
-                self.put(int(round(cx + a + self.rng.integers(-2, 3))), int(round(cy + b + self.rng.integers(-2, 3))),
-                         cz + int(self.rng.integers(-1, 2)), m["cu_block"], keep=True)
+                    cells[(x, y, z)] = st
+        return cells
+
+    def ring_whole(self, cx, cz):
+        for (x, y, z), st in self.ring_cells(cx, cz, 0, 360).items():
+            self.put(x, y, z, st, keep=True)
 
     def ring_fallen(self, cx, cz):
-        """The missing arc, broken in two and lying east of the spire."""
+        """The missing arc, broken in two and lying east of the spire. Debris: cleared when the Spire is restored."""
         m, rng = self.m, self.rng
         rad = 21.0
         pieces = ((-30, 22, (14, -46), 25, 3), (24, 95, (30, -68), 115, 1))
@@ -1068,9 +1236,9 @@ class City:
                         for oy in (0, 1, 2):
                             if abs(ox) + abs(oz) + (oy == 2) * 2 + (oy == 0) <= 2:
                                 st = m["cu_ch"] if deg % 15 == 0 else m["cu"]
-                                self.put(int(x) + ox, int(y) + oy, int(z) + oz, st, keep=True)
+                                self.debris_put(int(x) + ox, int(y) + oy, int(z) + oz, st)
                 if deg % 8 < 3:
-                    self.put(int(x), int(y) + 2, int(z), m["amethyst"], keep=True)
+                    self.debris_put(int(x), int(y) + 2, int(z), m["amethyst"])
             # aether crystals still growing out of the wreck
             for _ in range(40):
                 k = rng.integers(0, len(th))
@@ -1081,7 +1249,7 @@ class City:
                 if self.get(x, y, z) == AIR:
                     st = self.g.s("amethyst_cluster", facing="up", waterlogged=False) if rng.random() < 0.6 \
                         else m["amethyst"]
-                    self.put(x, y, z, st)
+                    self.debris_put(x, y, z, st)
 
     # ---------- the market ----------
     def market(self):
@@ -1118,23 +1286,26 @@ class City:
             for z in range(fz - 4, fz + 5):
                 d = math.hypot(x - fx, z - fz)
                 if d <= 3.2:
-                    self.put(x, G - 2, z, m["tuff_pol"], built=False)
-                    self.put(x, G - 1, z, m["water"] if d > 1 else m["tuff_ch"], built=False)
+                    self.put(x, G - 2, z, m["ds_pol"], built=False)
+                    self.put(x, G - 1, z, m["water"] if d > 1 else m["ds_ch"], built=False)
                 elif d <= 4.4:
-                    self.put(x, G - 1, z, m["lime_pol"], built=False)
-                    self.put(x, G, z, m["lime_pol"], keep=True)
-        self.box(fx, G, fz, fx, G + 2, fz, m["cu_ch"], keep=True)
+                    self.put(x, G - 1, z, m["ds_pol"], built=False)
+                    self.put(x, G, z, m["qz"], keep=True)
+        self.box(fx, G, fz, fx, G + 3, fz, m["qz_p"], keep=True)
+        self.put(fx, G + 4, fz, m["aether"], keep=True)
+        for o in ((1, 0, "east"), (-1, 0, "west"), (0, 1, "south"), (0, -1, "north")):
+            self.put(fx + o[0], G + 4, fz + o[1], self.g.s("amethyst_cluster", facing=o[2], waterlogged=False), keep=True)
         self.sign(fx + 1, G + 1, fz, "east", ["MARKET OF", "SEVEN ROADS"])
         self.sign(fx - 1, G + 1, fz, "west", ["MARKET OF", "SEVEN ROADS"])
-        self.put(fx, G + 3, fz, m["cu_block"], keep=True)
+        self.put(fx, G + 5, fz, self.g.s("amethyst_cluster", facing="up", waterlogged=False), keep=True)
         # old stalls: tuff posts, a limestone counter and a stone awning
         for sx in (49, 55, 63, 69):
             for sz in (-9, 7):
                 for px, pz in ((sx, sz), (sx + 2, sz), (sx, sz + 2), (sx + 2, sz + 2)):
-                    self.box(px, G, pz, px, G + 1, pz, self.wall("polished_tuff"))
-                self.box(sx, G + 2, sz, sx + 2, G + 2, sz + 2, self.slab("create:cut_limestone"))
+                    self.box(px, G, pz, px, G + 1, pz, self.wall("polished_deepslate"))
+                self.box(sx, G + 2, sz, sx + 2, G + 2, sz + 2, self.slab("smooth_quartz"))
                 self.box(sx, G, sz + (2 if sz < 0 else 0), sx + 2, G, sz + (2 if sz < 0 else 0),
-                         self.slab("create:polished_cut_limestone", "top"))
+                         self.slab("smooth_quartz", "top"))
                 for _ in range(2):
                     px, pz = sx + int(rng.integers(-1, 4)), sz + int(rng.integers(-1, 4))
                     if self.get(px, G, pz) == AIR:
@@ -1153,13 +1324,22 @@ class City:
         self.box(x0, G, z0, x1, G, z1, m["ds_pol"], keep=True)
         self.box(x0 + 1, G, z0 + 1, x1 - 1, G, z1 - 1, AIR, built=False)
         self.box(x0 + 1, G - 1, z0 + 1, x1 - 1, G - 1, z1 - 1, m["ds_t"], built=False)
-        self.box(x0, G + 4, z0, x1, G + 4, z1, m["ds_ch"], keep=True)
+        self.box(x0, G + 4, z0, x1, G + 4, z1, m["qz"], keep=True)
+        for x in range(x0 + 2, x1 - 1, 3):
+            for z in (z0, z1):
+                if not -61 <= x <= -57:
+                    self.box(x, G + 1, z, x, G + 3, z, m["glass_v"], keep=True)
+        for z in range(z0 + 2, z1 - 1, 3):
+            for x in (x0, x1):
+                self.box(x, G + 1, z, x, G + 3, z, m["glass_v"], keep=True)
         self.box(x0 + 1, G + 4, z0 + 1, x1 - 1, G + 4, z1 - 1, AIR, built=False)
         self.box(x0 + 1, G + 7, z0 + 1, x1 - 1, G + 7, z1 - 1, m["ds_t"], keep=True)
         self.hip_roof(x0 - 1, z0 - 1, x1 + 1, z1 + 1, G + 8, "deepslate_tile", m["ds_t"], keep=True)
         # portico and steps on the south side, facing the avenue
         for x in (-64, -61, -57, -54):
-            self.box(x, G, -10, x, G + 5, -10, m["ds_pol"], keep=True)
+            self.box(x, G, -10, x, G + 5, -10, m["qz_p"], keep=True)
+        self.put(-59, G + 7, -11, m["aether"], keep=True)
+        self.put(-59, G + 8, -11, self.g.s("amethyst_cluster", facing="up", waterlogged=False), keep=True)
         self.box(x0, G + 6, -11, x1, G + 6, -9, self.slab("deepslate_tile"), keep=True)
         self.box(-61, G - 1, -9, -57, G - 1, -8, m["ds_pol"], built=False)
         self.box(-60, G, z1, -58, G + 3, z1, AIR, built=False)
@@ -1214,8 +1394,8 @@ class City:
     def mast(self):
         m, s = self.m, self.g.s
         cx, cz = 60, 40
-        self.box(cx - 3, G, cz - 3, cx + 3, G + 1, cz + 3, m["tuff_pol"])
-        self.box(cx - 2, G + 2, cz - 2, cx + 2, G + 2, cz + 2, m["tuff_ch"])
+        self.box(cx - 3, G, cz - 3, cx + 3, G + 1, cz + 3, m["ds_pol"])
+        self.box(cx - 2, G + 2, cz - 2, cx + 2, G + 2, cz + 2, m["qz"])
         top = G + 40
         for x, z in ((cx - 2, cz - 2), (cx + 2, cz - 2), (cx - 2, cz + 2), (cx + 2, cz + 2)):
             self.box(x, G + 3, z, x, top, z, m["cu"], keep=True)
@@ -1226,9 +1406,10 @@ class City:
         self.box(cx - 4, top + 1, cz - 4, cx + 4, top + 1, cz + 4, self.slab("oxidized_cut_copper"), keep=True)
         self.box(cx - 1, top + 2, cz - 1, cx + 1, top + 4, cz + 1, m["cu"], keep=True)
         self.put(cx, top + 5, cz, m["bulb"], keep=True)
+        arm = G + 6 + 5 * ((top - 4 - (G + 6)) // 5)  # level with a grate ring, so it hangs off the frame
         for x in range(cx + 3, cx + 12):  # the docking arm
-            self.put(x, top - 2, cz, m["cu"], keep=True)
-        for y in range(top - 12, top - 2):
+            self.put(x, arm, cz, m["cu"], keep=True)
+        for y in range(arm - 10, arm):
             self.put(cx + 11, y, cz, s("chain", axis="y", waterlogged=False), keep=True)
         self.claim(cx - 6, cz - 6, cx + 13, cz + 6, 0.85, G + 45)
         self.site("mast", "The Mooring Mast", 3, self.rect(cx - 6, cz - 6, cx + 13, cz + 6))
@@ -1279,31 +1460,10 @@ class City:
         for ang in (45, 135, -45, -135):
             a = math.radians(ang)
             self.tower(84 * math.cos(a), 84 * math.sin(a), 6, G + 16, cap=True, integrity=0.75)
-        # three breaches where the wall came down
-        picks = []
-        while len(picks) < 3:
-            a = float(rng.uniform(-180, 180))
-            near = min(abs(((a - b + 180) % 360) - 180) for b in (0, 90, 180, -90, 45, 135, -45, -135))
-            if near > 16 and all(abs(((a - p + 180) % 360) - 180) > 40 for p in picks):
-                picks.append(a)
-        hn = noise2(dx.shape, 3, rng)
-        for a in picks:
-            w = rng.uniform(5, 9)
-            d = np.abs(((th - a + 180) % 360) - 180)
-            breach = (r >= 81) & (r < 87) & (d < w)
-            for y in range(G, top + 3):
-                keep_h = G + (hn * 3 * (d / w) * 2).astype(int)
-                cut = breach & (y > keep_h)
-                self.g.a[:, y, :][cut & (self.g.a[:, y, :] != VOID)] = AIR
-                self.g.built[:, y, :][cut] = False
-            spill = (r >= 76) & (r < 92) & (d < w + 2) & ~band
-            hgt = (np.clip(1 - np.abs(r - 84) / 8, 0, 1) * 4 * hn).astype(int)
-            for y in range(G, G + 4):
-                fill = spill & (hgt > y - G)
-                mix = np.choose(rng.integers(0, 4, dx.shape), [m["ds_t"], m["gravel"], m["ds_cob"], m["cobble"]])
-                self.g.a[:, y, :][fill] = mix[fill]
-                self.g.built[:, y, :][fill] = False
-            self.notes.append(f"wall breach at {a:.0f} degrees")
+        for q, (a0, a1) in {"ne": (-90, 0), "se": (0, 90), "sw": (90, 180), "nw": (-180, -90)}.items():
+            ang = (th - a0) % 360
+            sector = (r >= 78.5) & (r <= 92) & (ang > 14) & (ang < (a1 - a0) - 14)
+            self.site(f"wall_{q}", f"The {q.upper()} Wall", 3, sector, None)
 
     def gate_ring(self, ang):
         """A Convergence ring set into the gatehouse: copper outside, aether crystal inside, standing in the
@@ -1312,7 +1472,7 @@ class City:
         a = math.radians(ang)
         ux, uz = int(round(math.cos(a))), int(round(math.sin(a)))
         tx, tz = -uz, ux
-        cy, rad = G + 5, 7.5
+        cy, rad = G + 6, 10.5
         for t in np.arange(0, 2 * math.pi, 0.01):
             for dr in (-0.5, 0.5):
                 o = (rad + dr) * math.cos(t)
@@ -1419,18 +1579,15 @@ class City:
             return False
         w, d = x1 - x0 + 1, z1 - z0 + 1
         roll = rng.random()
-        if roll < 0.68:
-            deep = d if door in ("north", "south") else w
-            kind = "tower" if (min(w, d) >= 7 and rng.random() < 0.6) or deep < 7 else "terrace"
-            if kind == "tower" and min(w, d) < 7:
-                kind = "garden"
-                self.garden(x0, z0, x1, z1)
-            else:
-                self.building(kind, x0, z0, x1, z1, door, float(rng.uniform(0.5, 0.85)))
-        elif roll < 0.86 and self.free_plots < FREE_PLOTS:
+        if self.free_plots < 6 and rng.random() < 0.15:  # make sure there are enough free plots
+            roll = 0.85
+        if roll < 0.8:
+            kind = "tower" if min(w, d) >= 7 and rng.random() < 0.6 else "terrace"
+            self.building(kind, x0, z0, x1, z1, door, float(rng.uniform(0.5, 0.85)))
+        elif roll < 0.9 and self.free_plots < FREE_PLOTS:
             self.plot(x0, z0, x1, z1, door)
             kind = "free plot"
-        elif roll < 0.91:
+        elif roll < 0.95:
             self.garden(x0, z0, x1, z1)
             kind = "garden"
         else:
@@ -1448,8 +1605,8 @@ class City:
         g = self.g.a[:, G - 1, :]
         open_ground = (g == m["grass"]) & (self.r >= 20) & (self.r <= 80) & ~self.occupied
         paved = open_ground & (n > 0.42) & (speck < 0.8)
-        mix = np.choose(rng.integers(0, 5, n.shape), [m["lime_cut"], m["lime_small"], m["tuff_b"], m["tuff"],
-                                                       m["cobble"]])
+        mix = np.choose(rng.integers(0, 5, n.shape), [m["qz_b"], m["calcite"], m["ds_t"], m["ds_pol"],
+                                                       m["ds_cob"]])
         g[paved] = mix[paved]
         g[open_ground & (n > 0.42) & (speck >= 0.8) & (speck < 0.9)] = m["coarse"]
 
@@ -1463,14 +1620,14 @@ class City:
         self.sign(fx, G, fz, door, ["FREE PLOT", "", "Build here if", "you like"], font=None, standing=True)
         self.box(x0, G - 1, z0, x1, G - 1, z1, m["coarse"], built=False)
         for (ax, az, bx, bz) in ((x0, z0, x1, z0), (x0, z1, x1, z1), (x0, z0, x0, z1), (x1, z0, x1, z1)):
-            self.box(ax, G - 1, az, bx, G - 1, bz, m["tuff_pol"], built=False)
-            self.box(ax, G, az, bx, G, bz, m["lime"])
+            self.box(ax, G - 1, az, bx, G - 1, bz, m["ds_pol"], built=False)
+            self.box(ax, G, az, bx, G, bz, m["qz_b"])
         self.claim(x0 - 1, z0 - 1, x1 + 1, z1 + 1, 0.35)
 
     def garden(self, x0, z0, x1, z1):
         m, rng = self.m, self.rng
         for (ax, az, bx, bz) in ((x0, z0, x1, z0), (x0, z1, x1, z1), (x0, z0, x0, z1), (x1, z0, x1, z1)):
-            self.box(ax, G, az, bx, G, bz, self.wall("create:cut_limestone"))
+            self.box(ax, G, az, bx, G, bz, self.slab("smooth_quartz"))
         self.tree((x0 + x1) // 2, (z0 + z1) // 2, "birch" if rng.random() < .4 else "oak")
         self.claim(x0 - 1, z0 - 1, x1 + 1, z1 + 1, 0.5)
 
@@ -1483,11 +1640,11 @@ class City:
                 d = ((x - cx) / rx) ** 2 + ((z - cz) / rz) ** 2
                 if d <= 1:
                     h = int((1 - d) * 4 + rng.random())
-                    mix = [m["lime"], m["lime_raw"], m["cobble"], m["gravel"], m["tuff"], m["lime_layer"]]
+                    mix = [m["qz_b"], m["calcite"], m["ds_cob"], m["gravel"], m["ds_t"], m["iron_w"]]
                     for y in range(G, G + h):
                         self.put(x, y, z, mix[int(rng.integers(0, len(mix)))], built=False)
                     if h:
-                        self.put(x, G + h - 1, z, m["moss"] if rng.random() < .3 else m["lime_raw"], built=False)
+                        self.put(x, G + h - 1, z, m["moss"] if rng.random() < .3 else m["calcite"], built=False)
         self.claim(x0 - 1, z0 - 1, x1 + 1, z1 + 1, 0.4)
 
     def tree(self, x, z, kind="oak", height=None):
@@ -1507,11 +1664,68 @@ class City:
                             self.put(x + dx, y0 + h + dy, z + dz, leaves, built=False)
         self.box(x, y0, z, x, y0 + h, z, log, built=False)
 
-    # ---------- time ----------
+    # ---------- the Sundering, then time ----------
+    def snapshot(self):
+        """The city as it stood. Restoration rebuilds from this; everything after is damage."""
+        self.pre_a = self.g.a.copy()
+        self.removed = np.zeros(self.g.shape, bool)
+        self.debris = np.zeros(self.g.shape, bool)
+
+    def debris_put(self, x, y, z, st):
+        if self.g.inside(R + x, y, R + z):
+            self.put(x, y, z, st, built=False, keep=True)
+            self.debris[R + x, y, R + z] = True
+
+    def cut(self, mask3d):
+        """Remove blocks as damage: restoration puts them back."""
+        sel = mask3d & (self.g.a > AIR)
+        self.removed |= sel
+        self.g.a[sel] = AIR
+        self.g.built[sel] = False
+
+    def catastrophe(self):
+        """The Sundering: the Spire's crown shatters, its ring snaps and falls, the outer wall is breached."""
+        g, rng, m = self.g, self.rng, self.m
+        cx, cz = self.spire_c
+        lx, lz = self.dx - cx, self.dz - cz
+        lr = np.maximum(np.maximum(np.abs(lx), np.abs(lz)), (np.abs(lx) + np.abs(lz)) / 1.4142)
+        jag = G + 50 + (noise2(lx.shape, 3, rng) * 24).astype(int)
+        core = (np.abs(lx) <= 1) & (np.abs(lz) <= 1)
+        ys = np.arange(g.shape[1])[None, :, None]
+        crown = ((lr <= 11)[:, None, :] & (ys > jag[:, None, :]) & ~core[:, None, :]) | \
+                (core[:, None, :] & (ys > G + 64))
+        ring = np.zeros(g.shape, bool)
+        for (x, y, z) in self.ring_cells(cx, cz, -30, 100):
+            if g.inside(R + x, y, R + z):
+                ring[R + x, y, R + z] = True
+        self.cut(crown | ring)
+        self.ring_fallen(cx, cz)
+        # three breaches in the outer wall, with their stone spilled both ways
+        dx, dz, r, th = self.dx, self.dz, self.r, self.th
+        picks = []
+        while len(picks) < 3:
+            a = float(rng.uniform(-180, 180))
+            near = min(abs(((a - b + 180) % 360) - 180) for b in (0, 90, 180, -90, 45, 135, -45, -135))
+            if near > 16 and all(abs(((a - p + 180) % 360) - 180) > 40 for p in picks):
+                picks.append(a)
+        hn = noise2(dx.shape, 3, rng)
+        for a in picks:
+            w = rng.uniform(5, 9)
+            d = np.abs(((th - a + 180) % 360) - 180)
+            breach = (r >= 81) & (r < 87) & (d < w)
+            keep_h = G + (hn * 3 * (d / w) * 2).astype(int)
+            self.cut(breach[:, None, :] & (ys > keep_h[:, None, :]) & (ys < G + 14))
+            spill = (r >= 76) & (r < 92) & (d < w + 2) & ~((r >= 82.5) & (r < 85.5))
+            hgt = (np.clip(1 - np.abs(r - 84) / 8, 0, 1) * 4 * hn).astype(int)
+            for y in range(G, G + 4):
+                fill = spill & (hgt > y - G) & (g.a[:, y, :] == AIR)
+                mix = np.choose(rng.integers(0, 4, dx.shape), [m["ds_t"], m["gravel"], m["ds_cob"], m["cobble"]])
+                g.a[:, y, :][fill] = mix[fill]
+                self.debris[:, y, :] |= fill
+            self.notes.append(f"wall breach at {a:.0f} degrees")
+
     def decay(self):
         g, rng = self.g, self.rng
-        self.pre_a = g.a.copy()  # the city as designed, before time: restoration rebuilds from this
-        self.removed = np.zeros(g.shape, bool)
         before = g.built & (g.a > AIR)
         cand = before & ~g.keep
         cand[:, :G, :] = False
@@ -1542,8 +1756,8 @@ class City:
         m, g, rng = self.m, self.g, self.rng
         spread = box_blur(removed, 2)
         height = spread * 0.45 + rng.random(spread.shape) * 0.6
-        mix = [m["lime"], m["lime_raw"], m["cobble"], m["gravel"], m["tuff"], m["lime_layer"], m["andesite"]]
-        tops = [self.slab("create:cut_limestone"), self.slab("tuff_brick"), m["moss"], self.slab("cobblestone")]
+        mix = [m["qz_b"], m["calcite"], m["ds_cob"], m["gravel"], m["ds_t"], m["qz"], m["iron_w"]]
+        tops = [self.slab("smooth_quartz"), self.slab("polished_deepslate"), m["moss"], self.slab("cobbled_deepslate")]
         sus = self.g.s("suspicious_gravel", dusted=0)
         xs, zs = np.nonzero(height >= 1)
         for x, z in zip(xs.tolist(), zs.tolist()):
@@ -1592,6 +1806,11 @@ class City:
         """Drop anything the decay cut loose from the ground: no floating floors or platforms."""
         g = self.g
         solid = g.a > AIR
+        # only real masonry carries weight: glass panes, bars, rods, leaves and plants hang off it
+        from render import shape_of
+        bearing = np.array([shape_of(k) in ("cube", "slab", "slab_top") or "_stairs" in k or k.split("[")[0].endswith("_wall")
+                            for k in g.pal]) & ~np.array(["pane" in k or "glass" in k for k in g.pal])
+        conduct = bearing[g.a]
         reach = np.zeros(g.shape, bool)
         reach[:, :G, :] = solid[:, :G, :]
         count = int(reach.sum())
@@ -1603,13 +1822,20 @@ class City:
             grow[:, :-1] |= reach[:, 1:]
             grow[:, :, 1:] |= reach[:, :, :-1]
             grow[:, :, :-1] |= reach[:, :, 1:]
-            grow &= solid
+            grow &= conduct | (reach & ~conduct)
             n = int(grow.sum())
             reach = grow
             if n == count:
                 break
             count = n
-        loose = solid & ~reach & g.built & ~g.keep
+        near = reach.copy()
+        near[1:] |= reach[:-1]
+        near[:-1] |= reach[1:]
+        near[:, 1:] |= reach[:, :-1]
+        near[:, :-1] |= reach[:, 1:]
+        near[:, :, 1:] |= reach[:, :, :-1]
+        near[:, :, :-1] |= reach[:, :, 1:]
+        loose = solid & ~reach & ~(near & ~conduct) & g.built & ~g.keep
         self.removed |= loose
         g.a[loose] = AIR
         g.built[loose] = False
@@ -1727,7 +1953,14 @@ class City:
         self.conduits()
         self.monorail()
         self.pylons()
+        self.arcology()
+        self.archive()
+        self.towers = []  # only street towers get extra bridges
         self.districts()
+        self.sky_bridges()
+        self.snapshot()
+        self.catastrophe()
+        self.wear_streets()
         self.decay()
         self.place_signs()
         self.overgrowth()
@@ -1895,6 +2128,22 @@ def main():
             xs, zs = np.nonzero(site["mask"].any(axis=1))[0], np.nonzero(site["mask"].any(axis=0))[0]
             f.write(f"{name}\t{site['age']}\t{site['label']}\t{site.get('kind', 'landmark')}\t"
                     f"{xs.min() - R} {zs.min() - R} {xs.max() - R} {zs.max() - R}\n")
+    # the city as it stands at the end of Age V, every site restored: a preview, not shipped
+    final = g.a.copy()
+    for name in city.sites:
+        new = city.restore(name, 5)
+        d = new != g.a
+        final[d] = new[d]
+    fdir = os.path.join(dp, "data", "remnant", "structure", "core_final")
+    os.makedirs(fdir, exist_ok=True)
+    keep_nbt = {k: v for k, v in g.block_nbt.items() if final[k] == g.a[k]}
+    fns = types.SimpleNamespace(a=final, pal=g.pal, block_nbt=keep_nbt)
+    for i, x0 in enumerate(range(0, g.shape[0], 97)):
+        for j, z0 in enumerate(range(0, g.shape[2], 97)):
+            Grid.write_structure(fns, os.path.join(fdir, f"tile_{i}_{j}.nbt"), x0, min(x0 + 97, g.shape[0]),
+                                 z0, min(z0 + 97, g.shape[2]))
+    if a.jar and not a.no_render:
+        iso(types.SimpleNamespace(a=final, pal=g.pal), assets, scale=4).save(os.path.join(a.out, "iso_final.png"))
     houses = 0
     for name in city.sites:
         n = write_site(city, name, dp)
