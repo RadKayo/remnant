@@ -1,4 +1,4 @@
-"""Generate Remnant's ruined city core: the Ascendancy city the group restores at spawn.
+"""Generate Remainder, Remnant's ruined city core: the Ascendancy city the group restores at spawn.
 
 python citygen.py --seed 7 --out out/ --jar <client-extra.jar> --jar <create.jar>
 
@@ -1454,6 +1454,11 @@ class City:
             self.site(f"gate_{gname}", f"The {gname.title()} Gate", 2, window, self.props_gate(ang))
             self.sign(int(round(86 * math.cos(math.radians(ang)))), G + 8, int(round(86 * math.sin(math.radians(ang)))),
                       toward(math.cos(math.radians(ang)), math.sin(math.radians(ang))), ["", f"{gname.upper()} GATE"])
+            # the Remnant's own name for the city, on a plain wooden sign just inside the gate
+            ix, iz = int(round(78 * math.cos(math.radians(ang)))), int(round(78 * math.sin(math.radians(ang))))
+            ox, oz = (0, 5) if axis == "x" else (5, 0)
+            self.sign(ix + ox, G, iz + oz, toward(-math.cos(math.radians(ang)), -math.sin(math.radians(ang))),
+                      ["", "REMAINDER"], wood="spruce", font=None, standing=True)
             for off in (-1, 1):
                 a = math.radians(ang + off * 7)
                 self.tower(84 * math.cos(a), 84 * math.sin(a), 4.5, G + 14, cap=False, integrity=0.93)

@@ -1,6 +1,6 @@
-# City core generator
+# City core generator: Remainder
 
-`citygen.py` builds Remnant's ruined city core, the Ascendancy city the group restores at spawn, as blocks. It's all our own work, so the output can ship with the pack.
+`citygen.py` builds Remainder, the ruined Ascendancy city at spawn that the group restores. "Remainder" is the Remnant's own name for it, on plain wooden signs inside each gate. as blocks. It's all our own work, so the output can ship with the pack.
 
 What it builds, centred on the Hearth. The Ascendancy was a high-tech aether civilisation, and its city looks it: white quartz, dark iron, violet glass, verdigris copper, and aether-crystal conduits that are dark now and can be made to glow again.
 
