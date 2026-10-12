@@ -1,0 +1,63 @@
+{
+  "type": "neoforge:add_table",
+  "table": "remnant:inject/aether_core",
+  "conditions": [
+    {
+      "condition": "minecraft:any_of",
+      "terms": [
+        {
+          "condition": "neoforge:loot_table_id",
+          "loot_table_id": "minecraft:chests/end_city_treasure"
+        },
+        {
+          "condition": "neoforge:loot_table_id",
+          "loot_table_id": "minecraft:chests/ancient_city"
+        },
+        {
+          "condition": "neoforge:loot_table_id",
+          "loot_table_id": "aether:chests/dungeon/gold/gold_dungeon_reward"
+        },
+        {
+          "condition": "neoforge:loot_table_id",
+          "loot_table_id": "deeperdarker:chests/ancient_temple_apex"
+        },
+        {
+          "condition": "neoforge:loot_table_id",
+          "loot_table_id": "eternal_starlight:chests/golem_forge"
+        },
+        {
+          "condition": "neoforge:loot_table_id",
+          "loot_table_id": "cataclysm:chests/abandoned_treasure"
+        },
+        {
+          "condition": "neoforge:loot_table_id",
+          "loot_table_id": "cataclysm:chests/desert_treasure"
+        },
+        {
+          "condition": "neoforge:loot_table_id",
+          "loot_table_id": "cataclysm:chests/frosted_prison_treasure"
+        },
+        {
+          "condition": "neoforge:loot_table_id",
+          "loot_table_id": "bosses_of_mass_destruction:chests/obsidilith"
+        },
+        {
+          "condition": "neoforge:loot_table_id",
+          "loot_table_id": "bosses_of_mass_destruction:chests/lich_tower"
+        },
+        {
+          "condition": "neoforge:loot_table_id",
+          "loot_table_id": "bosses_of_mass_destruction:chests/gauntlet"
+        },
+        {
+          "condition": "neoforge:loot_table_id",
+          "loot_table_id": "block_factorys_bosses:chests/underworld_arena_vault"
+        },
+        {
+          "condition": "neoforge:loot_table_id",
+          "loot_table_id": "block_factorys_bosses:chests/dragon_tower"
+        }
+      ]
+    }
+  ]
+}

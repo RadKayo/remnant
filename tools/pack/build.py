@@ -7,8 +7,10 @@ python tools/pack/build.py <resolved.json> <jars dir>      (from the repo root, 
 - Client-only mods (Modrinth marks them server-unsupported: rendering, HUD, tooltips) get side = "client".
   Everything else installs on both sides: worldgen and library mods that Modrinth calls server-only still
   register content, and the Oct 8 audit booted clients with all of them.
-- Copies our own content into kubejs/: the Remming coin textures (over Create: Numismatics) and the
-  datapacks in datapacks/ (KubeJS loads kubejs/data as a datapack and kubejs/assets as a resource pack).
+- Copies our own content into kubejs/: our item textures (kubejs/assets/remnant/textures/item, from
+  branding/out), the Remming coin textures (over Create: Numismatics) and the datapacks in datapacks/
+  (KubeJS loads kubejs/data as a datapack and kubejs/assets as a resource pack). Generated folders are
+  wiped and rewritten each time; hand-written ones (scripts, lang) are left alone.
 """
 import hashlib
 import json
@@ -71,6 +73,13 @@ def main():
     os.makedirs(coins)
     for fn in os.listdir(os.path.join(ROOT, "branding", "out", "coins")):
         shutil.copy(os.path.join(ROOT, "branding", "out", "coins", fn), coins)
+    textures = os.path.join(kjs, "assets", "remnant", "textures", "item")
+    shutil.rmtree(textures, ignore_errors=True)
+    os.makedirs(textures)
+    for src in ("items", "relics"):
+        d = os.path.join(ROOT, "branding", "out", src)
+        for fn in os.listdir(d):
+            shutil.copy(os.path.join(d, fn), textures)
     data = os.path.join(kjs, "data")
     shutil.rmtree(data, ignore_errors=True)
     for pack in sorted(os.listdir(os.path.join(ROOT, "datapacks"))):

@@ -6,6 +6,10 @@ hash = "73334d945585ca61696114f365d4967194ac23129860a6a6fc37abd1ea94728c"
 preserve = true
 
 [[files]]
+file = "config/apotheosis/apotheosis.cfg"
+hash = "f659d6074d04178f6da131d256f14a7441d504ad0ec828d8942657b042aa89bd"
+
+[[files]]
 file = "config/minecolonies-server.toml"
 hash = "73e6bf02f62f3f298238a45a88d2521c34b457907e2f451def461e4720e26bfa"
 
@@ -46,6 +50,278 @@ file = "kubejs/assets/numismatics/textures/item/coin/sun.png.mcmeta"
 hash = "7e4e29710f0d37e005efbb7ce0736ccca82a1da58c79ae99e205d86ea89a3bdd"
 
 [[files]]
+file = "kubejs/assets/remnant/lang/en_us.json"
+hash = "7075f0570aff1a503c7f31787ae2f01c28f2e87b81f2df3b3e03871cefa64cd2"
+
+[[files]]
+file = "kubejs/assets/remnant/textures/item/aegis_plate.png"
+hash = "336c70eeb6c143750c0fc0bb3c2d760142df14ff574f5a89bfdfa53165f99301"
+
+[[files]]
+file = "kubejs/assets/remnant/textures/item/aegis_plate.png.mcmeta"
+hash = "7e4e29710f0d37e005efbb7ce0736ccca82a1da58c79ae99e205d86ea89a3bdd"
+
+[[files]]
+file = "kubejs/assets/remnant/textures/item/aegis_plate_sealed.png"
+hash = "24c4ebb94a06c6629d97dbc14e0743691f8e72257540446d39a37db64af559c2"
+
+[[files]]
+file = "kubejs/assets/remnant/textures/item/aether_blade.png"
+hash = "5ef65e6e567ef6368346663984431768e4fa8b4074b5fd597187a30cb52b198d"
+
+[[files]]
+file = "kubejs/assets/remnant/textures/item/aether_blade.png.mcmeta"
+hash = "7e4e29710f0d37e005efbb7ce0736ccca82a1da58c79ae99e205d86ea89a3bdd"
+
+[[files]]
+file = "kubejs/assets/remnant/textures/item/aether_blade_sealed.png"
+hash = "0562a25ddac4d86fc1bfc1e103443480888ed25cf6a617b2a53f79cfc2f311fc"
+
+[[files]]
+file = "kubejs/assets/remnant/textures/item/aether_cell.png"
+hash = "e7cbdf421b22a4dacffe33587bfd6e78edc39040fe51a51ce7fc0310295b411a"
+
+[[files]]
+file = "kubejs/assets/remnant/textures/item/aether_cell.png.mcmeta"
+hash = "7e4e29710f0d37e005efbb7ce0736ccca82a1da58c79ae99e205d86ea89a3bdd"
+
+[[files]]
+file = "kubejs/assets/remnant/textures/item/aether_cell_empty.png"
+hash = "2ef8bb08ba37be811d8d6d12e358caac33864cbf01fc52457e3b1e533a270151"
+
+[[files]]
+file = "kubejs/assets/remnant/textures/item/aether_core.png"
+hash = "601ab71439e9893de44381916bfd34b66a15dcea8070551d68511c05f0fe6981"
+
+[[files]]
+file = "kubejs/assets/remnant/textures/item/aether_core.png.mcmeta"
+hash = "b7a241927f6b575d9a1d7c92d8620271585a2064571be17e9e3789ca06145d73"
+
+[[files]]
+file = "kubejs/assets/remnant/textures/item/aether_pistol.png"
+hash = "385ac6ca69ef2e94a4b9d14db00c14ecb5d1dd6a777602d9156406e89e8c5458"
+
+[[files]]
+file = "kubejs/assets/remnant/textures/item/aether_pistol.png.mcmeta"
+hash = "7e4e29710f0d37e005efbb7ce0736ccca82a1da58c79ae99e205d86ea89a3bdd"
+
+[[files]]
+file = "kubejs/assets/remnant/textures/item/aether_pistol_sealed.png"
+hash = "19df0c721d77eea347eb7c4cae94375fe15e2fe48134d6411863bfb9f0ba6298"
+
+[[files]]
+file = "kubejs/assets/remnant/textures/item/aether_rifle.png"
+hash = "6a7e7268dbed4dc5dc0ca8e3dfbd1c9c2a650f85d6444ea4497de727063b5775"
+
+[[files]]
+file = "kubejs/assets/remnant/textures/item/aether_rifle.png.mcmeta"
+hash = "7e4e29710f0d37e005efbb7ce0736ccca82a1da58c79ae99e205d86ea89a3bdd"
+
+[[files]]
+file = "kubejs/assets/remnant/textures/item/aether_rifle_sealed.png"
+hash = "89cbbb9607071d1574abf350cedb9538267f0e12b74e0ef13bebf7bd75b2a3c1"
+
+[[files]]
+file = "kubejs/assets/remnant/textures/item/convergence_glaive.png"
+hash = "9d0ed2d7e4899c1a516c203f226ec48abb3b0f50491dd497185a836056c049e8"
+
+[[files]]
+file = "kubejs/assets/remnant/textures/item/convergence_glaive.png.mcmeta"
+hash = "7e4e29710f0d37e005efbb7ce0736ccca82a1da58c79ae99e205d86ea89a3bdd"
+
+[[files]]
+file = "kubejs/assets/remnant/textures/item/convergence_glaive_sealed.png"
+hash = "610fc8429a050b99ef89c9def2f7a9dd2613a9865f9dff598c8a94f6bcca06cc"
+
+[[files]]
+file = "kubejs/assets/remnant/textures/item/convergence_lance.png"
+hash = "b297be3d49e6eb91f724995d275e699ad83cb42719c8d1a6cf3eaee8338c76f0"
+
+[[files]]
+file = "kubejs/assets/remnant/textures/item/convergence_lance.png.mcmeta"
+hash = "7e4e29710f0d37e005efbb7ce0736ccca82a1da58c79ae99e205d86ea89a3bdd"
+
+[[files]]
+file = "kubejs/assets/remnant/textures/item/convergence_lance_sealed.png"
+hash = "63aa0ee65691e15a628d7f8676cdf55cab340ebe138bebce1288116cec7b2cce"
+
+[[files]]
+file = "kubejs/assets/remnant/textures/item/flint_hatchet.png"
+hash = "bb67ccfa5193340db9f707050c34d3e24008f069201b69e2d54ee76ffaab091d"
+
+[[files]]
+file = "kubejs/assets/remnant/textures/item/flint_shard.png"
+hash = "a6302ee0bd86d8f68a613354a96ca993d2ec4a257ac1d5101053c8ca96fa4a24"
+
+[[files]]
+file = "kubejs/assets/remnant/textures/item/foundry_codex.png"
+hash = "e9799ffff5ab34644113f6d949aeda7809a5c422a1c2d80819eb6e0a05c6f02c"
+
+[[files]]
+file = "kubejs/assets/remnant/textures/item/gearwright_schematic.png"
+hash = "976e3e02afb12129a0254007e332a27fa5784a2ec2b24fc8d5dbddc9e1be33d9"
+
+[[files]]
+file = "kubejs/assets/remnant/textures/item/gravity_maul.png"
+hash = "c89c1f9a72c036a8e66e5d600f4b452e27118cd3291f9d18865f36cc9120f776"
+
+[[files]]
+file = "kubejs/assets/remnant/textures/item/gravity_maul.png.mcmeta"
+hash = "7e4e29710f0d37e005efbb7ce0736ccca82a1da58c79ae99e205d86ea89a3bdd"
+
+[[files]]
+file = "kubejs/assets/remnant/textures/item/gravity_maul_sealed.png"
+hash = "70a55c885f9e2ae8fd1a9986b301eaa975e473adb9b4dd524fc8a4f0feac086e"
+
+[[files]]
+file = "kubejs/assets/remnant/textures/item/hearthstone.png"
+hash = "d618d837efd6c94c940dd118c4ee978dfd7c67ef5edff915b9da97d18e017f06"
+
+[[files]]
+file = "kubejs/assets/remnant/textures/item/hearthstone.png.mcmeta"
+hash = "b7a241927f6b575d9a1d7c92d8620271585a2064571be17e9e3789ca06145d73"
+
+[[files]]
+file = "kubejs/assets/remnant/textures/item/memory_shard.png"
+hash = "61437ec63f3b5944c1021a42514fa79f14db0bf6df9f01f35eef6e6d5db908b4"
+
+[[files]]
+file = "kubejs/assets/remnant/textures/item/memory_shard.png.mcmeta"
+hash = "b7a241927f6b575d9a1d7c92d8620271585a2064571be17e9e3789ca06145d73"
+
+[[files]]
+file = "kubejs/assets/remnant/textures/item/menders_censer.png"
+hash = "036e9db79e2d2d239bae19bbcc05fe7f21ad170deeab3fc3bc779a16da525b19"
+
+[[files]]
+file = "kubejs/assets/remnant/textures/item/menders_censer.png.mcmeta"
+hash = "7e4e29710f0d37e005efbb7ce0736ccca82a1da58c79ae99e205d86ea89a3bdd"
+
+[[files]]
+file = "kubejs/assets/remnant/textures/item/menders_censer_sealed.png"
+hash = "f045c3791ec2f4093c756d9927c9b99eea0174fb6cf47a06f8bbec0b0213311c"
+
+[[files]]
+file = "kubejs/assets/remnant/textures/item/phase_dagger.png"
+hash = "db91b6238951008bc04adde78bee2113c63a2554b4cff708b283b3ef44ae7aa9"
+
+[[files]]
+file = "kubejs/assets/remnant/textures/item/phase_dagger.png.mcmeta"
+hash = "7e4e29710f0d37e005efbb7ce0736ccca82a1da58c79ae99e205d86ea89a3bdd"
+
+[[files]]
+file = "kubejs/assets/remnant/textures/item/phase_dagger_sealed.png"
+hash = "cc32d1be5ef696dc511081ea058be9f6bc5443189e77f738b320d35f252b0913"
+
+[[files]]
+file = "kubejs/assets/remnant/textures/item/presidential_pants.png"
+hash = "a3127cea9c23e2994c38d6528427b8736ed0e56d9f0b42e14ea5e1fe2cb8a754"
+
+[[files]]
+file = "kubejs/assets/remnant/textures/item/pulse_gauntlets.png"
+hash = "7d865d830b232857dbf9e8ba786e847432ada681320577776f541c3bf7635c3d"
+
+[[files]]
+file = "kubejs/assets/remnant/textures/item/pulse_gauntlets.png.mcmeta"
+hash = "7e4e29710f0d37e005efbb7ce0736ccca82a1da58c79ae99e205d86ea89a3bdd"
+
+[[files]]
+file = "kubejs/assets/remnant/textures/item/pulse_gauntlets_sealed.png"
+hash = "fc89067ad4e23627672b3fb69741dee6319fa87dd7c88eaeddc7ee947b2052e4"
+
+[[files]]
+file = "kubejs/assets/remnant/textures/item/relay_kit.png"
+hash = "6b2a4fdfcc405909d41279b7b11da21bd0cecdf4c479de44b4a1f61d52c28fc5"
+
+[[files]]
+file = "kubejs/assets/remnant/textures/item/resonance_tachi.png"
+hash = "104ec4f2d7ada0f9879cb7da94993cb140553eb07775242d5b820416a28f480b"
+
+[[files]]
+file = "kubejs/assets/remnant/textures/item/resonance_tachi.png.mcmeta"
+hash = "7e4e29710f0d37e005efbb7ce0736ccca82a1da58c79ae99e205d86ea89a3bdd"
+
+[[files]]
+file = "kubejs/assets/remnant/textures/item/resonance_tachi_sealed.png"
+hash = "12a015c886bbe9b2131a2ee77f896577c30ff6ffca8fd40bbf670e6a1eb4bccc"
+
+[[files]]
+file = "kubejs/assets/remnant/textures/item/rubbing.png"
+hash = "a22468996e0ac70f13e062ad9ad70c37737dd97c53af4ece0274969b93dc7514"
+
+[[files]]
+file = "kubejs/assets/remnant/textures/item/rune_primer.png"
+hash = "319641e4be5a6ab70c449a99a78748329d2013dadad7102e8b80715f05f63f1a"
+
+[[files]]
+file = "kubejs/assets/remnant/textures/item/salvaged_circuitry.png"
+hash = "67f27f2a950a139264e924c99c20de2c3c0c7189a5f8f7cfda9140241347befd"
+
+[[files]]
+file = "kubejs/assets/remnant/textures/item/sentinel_core.png"
+hash = "ce7deb2dc222124f32f267b19101e9f9db8066dc63f85b2e4a3dc02fe5f65937"
+
+[[files]]
+file = "kubejs/assets/remnant/textures/item/sentinel_core.png.mcmeta"
+hash = "7e4e29710f0d37e005efbb7ce0736ccca82a1da58c79ae99e205d86ea89a3bdd"
+
+[[files]]
+file = "kubejs/assets/remnant/textures/item/sentinel_core_sealed.png"
+hash = "07f5dfb7153368c508bf2e65434fbea767ab077b32df95beacab0566a332fa7d"
+
+[[files]]
+file = "kubejs/assets/remnant/textures/item/spireguard_greatsword.png"
+hash = "a8b614d1c5535c9fa3ef04f13e100a81fece7caec307c6530f8d3d4a45d8649d"
+
+[[files]]
+file = "kubejs/assets/remnant/textures/item/spireguard_greatsword.png.mcmeta"
+hash = "7e4e29710f0d37e005efbb7ce0736ccca82a1da58c79ae99e205d86ea89a3bdd"
+
+[[files]]
+file = "kubejs/assets/remnant/textures/item/spireguard_greatsword_sealed.png"
+hash = "653050e135782253344432b3bf320c80d8ee876ba993a200b5ef9ef39f0601a0"
+
+[[files]]
+file = "kubejs/assets/remnant/textures/item/starfall_bow.png"
+hash = "a0fa5f42afa1a82bf72263520bfe5574c37cc06f5033a09c8937399f0571eec2"
+
+[[files]]
+file = "kubejs/assets/remnant/textures/item/starfall_bow.png.mcmeta"
+hash = "7e4e29710f0d37e005efbb7ce0736ccca82a1da58c79ae99e205d86ea89a3bdd"
+
+[[files]]
+file = "kubejs/assets/remnant/textures/item/starfall_bow_sealed.png"
+hash = "d8d3204212cfaf88ae99f8a0b663cb8dd53de759b17f97a780cc1cc6c7041830"
+
+[[files]]
+file = "kubejs/assets/remnant/textures/item/stasis_pylon.png"
+hash = "b34adf390665de4f3d5267ede0dbe826aa66fdef8bebc804e2a7d3c4b8bc8787"
+
+[[files]]
+file = "kubejs/assets/remnant/textures/item/stasis_pylon.png.mcmeta"
+hash = "7e4e29710f0d37e005efbb7ce0736ccca82a1da58c79ae99e205d86ea89a3bdd"
+
+[[files]]
+file = "kubejs/assets/remnant/textures/item/stasis_pylon_sealed.png"
+hash = "80402ffff444b9b2ad0d6d80ae300f8dff965c9f4e899227cd547d42212bd25b"
+
+[[files]]
+file = "kubejs/assets/remnant/textures/item/torn_page.png"
+hash = "a8cf480cd1587f3827874c1cbff23adcdaac693629aa8401df5eca71f70f0ccf"
+
+[[files]]
+file = "kubejs/assets/remnant/textures/item/twin_arc_sabres.png"
+hash = "3c81d36dbc7116d44e0c50fb530ae4bd7164aa9bade9fd086f764e6dbbd72b5a"
+
+[[files]]
+file = "kubejs/assets/remnant/textures/item/twin_arc_sabres.png.mcmeta"
+hash = "7e4e29710f0d37e005efbb7ce0736ccca82a1da58c79ae99e205d86ea89a3bdd"
+
+[[files]]
+file = "kubejs/assets/remnant/textures/item/twin_arc_sabres_sealed.png"
+hash = "98cab0b08cd180ee90ca865cc5d78f1b1d6cdc199ffe82a259ab068e1d6ce58e"
+
+[[files]]
 file = "kubejs/data/cgs/weapons/flintlock.json"
 hash = "8adfef7abc8e64f698575a7ff158872a224eb4d7272142824208111685ac6297"
 
@@ -68,6 +344,10 @@ hash = "0bd4c081d02845a0202ef3f698963069488711adb3786d02609c4c331193b6ec"
 [[files]]
 file = "kubejs/data/cgs/weapons/shotgun.json"
 hash = "5f23e28abff5b9230b0a2b86fd924a6d89d4b72b19fe26530dbc8eb0e8e447df"
+
+[[files]]
+file = "kubejs/data/neoforge/loot_modifiers/global_loot_modifiers.json"
+hash = "de76b3c16ee0e0a0707b1dc5fae976149b48bd0223c78a41de1e1fe0b9cd02a4"
 
 [[files]]
 file = "kubejs/data/ntgl/ammo/fusion_cell.json"
@@ -110,12 +390,56 @@ file = "kubejs/data/remnant/lithostitched/worldgen_modifier/ember_ascendancy_rui
 hash = "4e9c561f3dc8cb54c8bf3f23a2ae845dc314a810a482cfcb31a01389a7134240"
 
 [[files]]
+file = "kubejs/data/remnant/loot_modifiers/aether_core.json"
+hash = "61ac56ad18152cc5bf23cb03866ed689145926acd95f0216aa75c69fe6a04f9a"
+
+[[files]]
+file = "kubejs/data/remnant/loot_modifiers/foundry_codex.json"
+hash = "acd237e976a98d1a288cf165285adee9749ad5db48f861e62abb80e2639e3483"
+
+[[files]]
+file = "kubejs/data/remnant/loot_modifiers/gearwright_schematic.json"
+hash = "e82535eaf5a6263153ade8cc510f61afd82456e6874ebba5ac11abe3e07f6ea5"
+
+[[files]]
+file = "kubejs/data/remnant/loot_modifiers/salvaged_circuitry.json"
+hash = "2a0b5524066bf0fa475ea3ea1d262ac5e702d4bb654d168416fc218b0ba2d33a"
+
+[[files]]
+file = "kubejs/data/remnant/loot_table/inject/aether_core.json"
+hash = "2b04c0e847948be9dec1de0ab9211ad2ae7448efa743d49d6147724e19d99469"
+
+[[files]]
+file = "kubejs/data/remnant/loot_table/inject/foundry_codex.json"
+hash = "c5eba166729e0caab68e75eecf3a2330295924caaad08e934ce42679cd834d81"
+
+[[files]]
+file = "kubejs/data/remnant/loot_table/inject/gearwright_schematic.json"
+hash = "44bd5a089f26ecc942a1486035b13ea8a591166d399c59df262913845295b082"
+
+[[files]]
+file = "kubejs/data/remnant/loot_table/inject/salvaged_circuitry.json"
+hash = "eb3ad085e7b2229a81f4fb668732fe14e347b776fab77454f5e2b235993e904f"
+
+[[files]]
 file = "kubejs/data/remnant/worldgen/processor_list/ascendancy_ruins.json"
 hash = "0c426b103be16ced9c72b7993189448014d14231eb4f3b591445e6f0dd988f2f"
 
 [[files]]
 file = "kubejs/data/remnant/worldgen/processor_list/ascendancy_ruins_light.json"
 hash = "79a8fe197855853ed63b765130d240cbecc35d56fea8aceed3a98b3af316b5fd"
+
+[[files]]
+file = "kubejs/server_scripts/ages.js"
+hash = "79e0b71c787cf41c5e498a69b75e7dc58a1d80080d566bf6d934264ce050b13d"
+
+[[files]]
+file = "kubejs/server_scripts/stone_age.js"
+hash = "424621f915019c65062bbb7767dbfea4dabf16fd027a9228e891dd22c998166b"
+
+[[files]]
+file = "kubejs/startup_scripts/remnant_items.js"
+hash = "726acd837c9258d71acbc65d989c4663ce3b4748c08b95f43c44dae7bb32ec23"
 
 [[files]]
 file = "mods/ae2.pw.toml"

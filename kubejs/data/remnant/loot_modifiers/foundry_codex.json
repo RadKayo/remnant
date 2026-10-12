@@ -1,0 +1,63 @@
+{
+  "type": "neoforge:add_table",
+  "table": "remnant:inject/foundry_codex",
+  "conditions": [
+    {
+      "condition": "minecraft:any_of",
+      "terms": [
+        {
+          "condition": "neoforge:loot_table_id",
+          "loot_table_id": "minecraft:chests/ancient_city"
+        },
+        {
+          "condition": "neoforge:loot_table_id",
+          "loot_table_id": "minecraft:chests/bastion_treasure"
+        },
+        {
+          "condition": "neoforge:loot_table_id",
+          "loot_table_id": "minecraft:chests/stronghold_library"
+        },
+        {
+          "condition": "neoforge:loot_table_id",
+          "loot_table_id": "betterstrongholds:chests/grand_library"
+        },
+        {
+          "condition": "neoforge:loot_table_id",
+          "loot_table_id": "betterfortresses:chests/keep"
+        },
+        {
+          "condition": "neoforge:loot_table_id",
+          "loot_table_id": "alexscaves:chests/magnetic_ruins"
+        },
+        {
+          "condition": "neoforge:loot_table_id",
+          "loot_table_id": "alexscaves:chests/toxic_ruins"
+        },
+        {
+          "condition": "neoforge:loot_table_id",
+          "loot_table_id": "cataclysm:chests/acropolis_treasure"
+        },
+        {
+          "condition": "neoforge:loot_table_id",
+          "loot_table_id": "twilightforest:chests/tower_library"
+        },
+        {
+          "condition": "neoforge:loot_table_id",
+          "loot_table_id": "goety:chests/blacksmith_treasure"
+        },
+        {
+          "condition": "neoforge:loot_table_id",
+          "loot_table_id": "undergarden:chests/catacombs"
+        },
+        {
+          "condition": "neoforge:loot_table_id",
+          "loot_table_id": "illagerinvasion:chests/illager_fort_tower"
+        },
+        {
+          "condition": "neoforge:loot_table_id",
+          "loot_table_id": "irons_spellbooks:chests/catacombs/dead_king_vault"
+        }
+      ]
+    }
+  ]
+}

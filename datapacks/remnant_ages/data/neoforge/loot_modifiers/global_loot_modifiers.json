@@ -1,0 +1,9 @@
+{
+  "replace": false,
+  "entries": [
+    "remnant:salvaged_circuitry",
+    "remnant:gearwright_schematic",
+    "remnant:foundry_codex",
+    "remnant:aether_core"
+  ]
+}
