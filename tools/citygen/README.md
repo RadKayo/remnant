@@ -16,6 +16,31 @@ What it builds, centred on the Hearth:
 
 The materials are cream limestone (Create), grey tuff, verdigris copper and amethyst. Decay comes from noise: ground floors mostly stand, roofs mostly don't, and landmarks break in big collapses rather than pinholes. Rubble piles up where blocks fell, and anything cut loose from the ground is dropped. Grass, moss, vines, glow lichen and a few trees grow over it.
 
+Inside the ruins:
+
+- **Furnishings:** counters and cauldrons, plus barrels and decorated pots that roll the `remnant:ruins/house` loot table.
+- **Rubble:** some of it is suspicious gravel, brushed for `remnant:ruins/rubble`. Both tables hold placeholder vanilla items until the lore items (Torn Pages, Memory Shards) exist.
+- **Inscriptions:** waxed signs written in the Runelic font (`runelic:runelic`), so they show as runes. They name shops over doors and mark the Hearth, the Spire, the market, the crypt and each gate.
+
+## Restoration
+
+Every landmark is a site the group restores: `hearth`, `gate_north`, `gate_east`, `gate_south`, `gate_west`, `market`, `crypt` and `mast`. A restored site is built from the same design as the ruin:
+
+- What fell is put back in the materials of the Age that rebuilt it: mud brick in Age I, cobblestone in Age II, stone brick in Age III, brick in Age IV, and the original stone in Age V. Salvaged metal goes back as it was.
+- Rubble, vines and moss are cleared. Grass and flowers stay.
+- The Age adds its own touches. The Hearth's brazier is lit, with torches on the old lamp posts. A mended gate gets torches beside the arch and banners above it.
+
+Only blocks inside the site change, so anything players built nearby is left alone. Each site is written as structure templates three layers high, plus a function that places them one after another with dust and sound, and then announces the restoration to everyone:
+
+```mcfunction
+summon minecraft:marker <Hearth x> <ground y> <Hearth z> {Tags:["remnant_core"]}
+function remnant:restore/gate_south
+```
+
+The marker goes on the Hearth's ground block once, when the core is pasted; the functions find the site from it. An FTB Quests command reward can call the function when the group completes the site's project.
+
+Keep the seed and the generator version fixed once the core is in a world. The restorations are differences from that exact ruin.
+
 ## Running
 
 ```bash
@@ -33,6 +58,7 @@ Output in `out/`:
 | `core.schem` | WorldEdit schematic, 193 × 100 × 193. Stand where the Hearth goes, with your feet on the ground, and run `//schem load core` then `//paste -m !minecraft:structure_void`. The mask leaves the terrain outside the city untouched. |
 | `datapack/` | The same city as four vanilla structure templates, `remnant:core/tile_<x>_<z>`. In a world whose ground is at y = 10, `/place template` them at (-96, -1, -96), (-96, -1, 1), (1, -1, -96) and (1, -1, 1). Forceload the area first. |
 | `plan.png`, `iso.png`, `iso_centre.png` | Quick previews without the game |
+| `datapack/data/remnant/function/restore/` | The restoration functions, with their templates under `structure/core/site/` |
 | `samples.txt` | One position per block state, relative to the Hearth with y = 0 at ground level, for checking a placement with `/execute if block` |
 
 ## Checked in game

@@ -7,12 +7,14 @@ structure tiles for /place template (datapack/), plan.png and iso.png previews.
 Everything is our own work, so the output can ship with the pack.
 """
 import argparse
+import json
 import math
 import os
+import types
 
 import numpy as np
 
-from voxel import AIR, VOID, Grid
+from voxel import AIR, VOID, Byte, Grid, List
 
 R = 96  # half width: the grid is 193 x 193 columns, centred on the Hearth
 Y = 100
@@ -21,6 +23,14 @@ WALL_R = 84
 FOOT_R = 92
 
 DIRS = {"north": (0, -1), "south": (0, 1), "east": (1, 0), "west": (-1, 0)}
+HOUSE_NAMES = ["LAMPWRIGHT", "COPPERSMITH", "SCRIBE", "CHANDLER", "WEAVER", "GLASSWORKS", "BATHS", "AETHER|WORKS",
+               "HOUSE|VELL", "HOUSE|ORREN", "HOUSE|MAREK", "COUNTING|HOUSE", "APOTHECARY", "BAKER", "SCHOOL",
+               "LODGINGS", "CLOCKMAKER", "CARTOGRAPHER", "TEA HOUSE", "LENSGRINDER"]
+# Remnant repairs show the Age they were made in: masonry by Age, metal salvaged and put back
+REPAIR = {1: "mud_brick", 2: "cobblestone", 3: "stone_brick", 4: "brick"}
+SALVAGED = ("copper", "amethyst", "grate", "bulb", "chain", "lantern", "bars", "door", "campfire", "candle", "skull",
+            "bed", "barrel", "pot", "lectern", "composter", "hay", "log", "planks", "wool", "fence", "glass", "sign",
+            "banner", "torch", "spruce", "oak", "birch", "crafting", "cauldron")
 OPPOSITE = {"north": "south", "south": "north", "east": "west", "west": "east"}
 
 
@@ -101,6 +111,8 @@ class City:
         self.roads = np.zeros(self.dx.shape, bool)
         self.lots = []
         self.notes = []
+        self.signs = []
+        self.sites = {}  # landmarks the group restores, each with a footprint and the Age of its repairs
         s = self.g.s
         self.m = {
             # the Ascendancy's city: cream limestone, grey tuff, verdigris copper, aether crystal
@@ -157,6 +169,81 @@ class City:
             self.integrity[sl] = integrity
         if top is not None:
             self.htop[sl] = top
+
+    # ---------- restoration sites ----------
+    def rect(self, x0, z0, x1, z1):
+        return (self.dx >= x0) & (self.dx <= x1) & (self.dz >= z0) & (self.dz <= z1)
+
+    def site(self, name, label, age, mask, props=None):
+        self.sites[name] = {"label": label, "age": age, "mask": mask, "props": props}
+
+    def wput(self, arr, dx, y, dz, st):
+        if self.g.inside(R + dx, y, R + dz):
+            arr[R + dx, y, R + dz] = st
+
+    def wget(self, arr, dx, y, dz):
+        return int(arr[R + dx, y, R + dz]) if self.g.inside(R + dx, y, R + dz) else VOID
+
+    def repair(self, i, age):
+        """The block the Remnant put back where an Ascendancy block fell, in the Age they did it."""
+        key = self.g.pal[i]
+        name, _, rest = key.partition("[")
+        bare = name.split(":")[1]
+        if age >= 5 or any(w in bare for w in SALVAGED):
+            return i
+        base = REPAIR[age]
+        props = dict(p.split("=", 1) for p in rest.rstrip("]").split(",")) if rest else {}
+        for kind in ("_stairs", "_slab", "_wall"):
+            if bare.endswith(kind):
+                return self.g.s(base + kind, **props)
+        return self.g.s({"mud_brick": "mud_bricks", "stone_brick": "stone_bricks", "brick": "bricks"}.get(base, base))
+
+    def restore(self, name):
+        """The site as the group rebuilds it: fallen blocks put back in the Age's own materials,
+        rubble and weeds cleared, and whatever the Age adds."""
+        g, site = self.g, self.sites[name]
+        mask = np.repeat(site["mask"][:, None, :], g.shape[1], axis=1)
+        new = g.a.copy()
+        fill = mask & self.removed
+        for i in np.unique(self.pre_a[fill]):
+            new[fill & (self.pre_a == i)] = self.repair(int(i), site["age"])
+        plants = self.g.ids_where(lambda k: any(p in k for p in ("grass[", "short_grass", "tall_grass", "fern",
+                                                                    "poppy", "dandelion", "daisy", "cornflower",
+                                                                    "bluet")))
+        junk = mask & (self.pre_a == AIR) & (g.a > AIR) & ~g.keep & ~np.isin(g.a, plants)
+        junk[:, :G, :] = False
+        new[junk] = AIR
+        if site["props"]:
+            site["props"](new)
+        return new
+
+    def props_hearth(self, new):
+        """Age I, Rekindle the Hearth: the brazier burns, and torches sit where the lamps no longer work."""
+        s = self.g.s
+        self.wput(new, 0, G, 0, s("campfire", lit=True, facing="north", signal_fire=False, waterlogged=False))
+        for sx in (-1, 1):
+            for sz in (-1, 1):
+                self.wput(new, 8 * sx, G + 3, 8 * sz, s("torch"))
+
+    def props_gate(self, ang):
+        def props(new):
+            """Age II, Mend the Gate: torches either side of the arch, the Remnant's banners above it."""
+            s = self.g.s
+            a = math.radians(ang)
+            ux, uz = int(round(math.cos(a))), int(round(math.sin(a)))
+            tx, tz = -uz, ux
+            facing = toward(ux, uz)
+            torch, banner = s("wall_torch", facing=facing), s("red_wall_banner", facing=facing)
+            for off, y, st in ((-4, G + 3, torch), (4, G + 3, torch), (-2, G + 7, banner), (2, G + 7, banner)):
+                seen = False
+                for k in range(78, 93):
+                    x, z = tx * off + ux * k, tz * off + uz * k
+                    if self.wget(new, x, y, z) > AIR:
+                        seen = True
+                    elif seen:
+                        self.wput(new, x, y, z, st)
+                        break
+        return props
 
     # ---------- terrain and streets ----------
     def terrain(self):
@@ -226,6 +313,9 @@ class City:
                 self.put(ox, G, oz, self.slab("oxidized_cut_copper"), keep=True)
         self.put(0, G, 0, self.g.s("campfire", lit=False, facing="north", signal_fire=False, waterlogged=False),
                  keep=True)
+        self.sign(0, G - 1, 2, "south", ["HERE BURNS", "THE FIRST", "FLAME"])
+        self.site("hearth", "The Hearth", 1, r <= 20, self.props_hearth)
+        self.sign(0, G - 1, -2, "north", ["OF THE", "CONVERGENCE"])
         # benches facing the fire, lamp posts on the diagonals
         for x in range(-10, 11):
             for z in range(-10, 11):
@@ -271,6 +361,12 @@ class City:
         pz = z1 if ddz > 0 else z0 if ddz < 0 else mz
         self.box(px, G, pz, px, G + 2, pz, AIR, built=False)
         self.put(px + ddx, G - 1, pz + ddz, m["lime_pol"], built=False)
+        if not keep:
+            self.furnish(x0, z0, x1, z1, px, pz)
+            if self.rng.random() < 0.45:
+                name = HOUSE_NAMES[int(self.rng.integers(0, len(HOUSE_NAMES)))]
+                self.put(px, G + 3, pz, wall, keep=True)  # the lintel holding the name survives
+                self.sign(px + ddx, G + 3, pz + ddz, door, name.split("|"))
         # roof
         top = G + h
         if roof == "flat":
@@ -282,6 +378,50 @@ class City:
             top += min(x1 - x0, z1 - z0) // 2 + 1
         self.claim(x0 - 1, z0 - 1, x1 + 1, z1 + 1, integrity, top)
         return top
+
+    def furnish(self, x0, z0, x1, z1, px, pz):
+        """What the Ascendancy left behind: counters, cauldrons, and barrels and pots worth searching."""
+        rng, s = self.rng, self.g.s
+        spots = [(x, z) for x in range(x0 + 1, x1) for z in range(z0 + 1, z1)
+                 if (x in (x0 + 1, x1 - 1) or z in (z0 + 1, z1 - 1)) and abs(x - px) + abs(z - pz) > 2]
+        for k in rng.permutation(len(spots))[:int(rng.integers(1, 4))]:
+            x, z = spots[int(k)]
+            roll = rng.random()
+            if roll < 0.35:
+                self.loot(x, G, z, "barrel", s("barrel", facing="up", open=False))
+            elif roll < 0.6:
+                self.loot(x, G, z, "decorated_pot", s("decorated_pot", facing="north", cracked=bool(rng.random() < .5),
+                                                     waterlogged=False))
+            elif roll < 0.82:
+                self.put(x, G, z, self.slab("create:polished_cut_limestone", "top"), built=False)
+            else:
+                self.put(x, G, z, s("cauldron"), built=False)
+
+    def loot(self, x, y, z, kind, st, table="remnant:ruins/house"):
+        self.put(x, y, z, st, built=False)
+        self.g.block_nbt[(R + x, y, R + z)] = {"id": f"minecraft:{kind}", "LootTable": table}
+
+    def sign(self, x, y, z, facing, lines, wood="birch"):
+        """An inscription in the Ascendancy's runes (the Runelic font). Placed after decay, where its wall survived."""
+        self.signs.append((x, y, z, facing, lines, wood))
+
+    def place_signs(self):
+        full = self.full_cubes()
+        placed = 0
+        for x, y, z, facing, lines, wood in self.signs:
+            ox, oz = DIRS[facing]
+            support = self.get(x - ox, y, z - oz)
+            if self.get(x, y, z) != AIR or support >= len(full) or not full[support]:
+                continue
+            self.put(x, y, z, self.g.s(f"{wood}_wall_sign", facing=facing, waterlogged=False), built=False, keep=True)
+            text = [json.dumps({"text": t, "font": "runelic:runelic"}) for t in (list(lines) + [""] * 4)[:4]]
+            blank = [json.dumps({"text": ""})] * 4
+            self.g.block_nbt[(R + x, y, R + z)] = {
+                "id": "minecraft:sign", "is_waxed": Byte(1),
+                "front_text": {"messages": List(8, text), "color": "black", "has_glowing_text": Byte(0)},
+                "back_text": {"messages": List(8, blank), "color": "black", "has_glowing_text": Byte(0)}}
+            placed += 1
+        self.notes.append(f"{placed} of {len(self.signs)} inscriptions placed")
 
     def hip_roof(self, x0, z0, x1, z1, y, base, fill, keep=False):
         while x0 <= x1 and z0 <= z1:
@@ -333,44 +473,49 @@ class City:
         self.claim(x0 - 2, z0 - 2, x1 + 2, z1 + 2, 1.0)
 
     def camp(self):
-        """Where the Remnant actually live, for now: shelters, bedrolls, firewood and a garden by the plaza."""
+        """Where the Remnant actually live, for now: tents, firewood, a fire and a garden by the plaza."""
         m, s, rng = self.m, self.g.s, self.rng
         x0, z0, x1, z1 = -33, -16, -20, -6
         self.box(x0, G - 1, z0, x1, G - 1, z1, m["coarse"], built=False)
-        # three lean-to shelters along the north side, open to the south
-        for i, sx in enumerate((x0, x0 + 5, x0 + 10)):
-            for x in range(sx, sx + 3):
-                self.put(x, G + 2, z0, s("spruce_log", axis="x"), built=False, keep=True)
-                self.put(x, G + 1, z0 + 1, self.stairs("spruce", "north"), built=False, keep=True)
-                self.put(x, G, z0 + 2, self.slab("spruce", "top") if x != sx + 1 else AIR, built=False, keep=True)
-            for x in (sx, sx + 2):
-                self.box(x, G, z0, x, G + 1, z0, s("spruce_fence", north=False, east=False, south=False, west=False,
-                                                   waterlogged=False), built=False, keep=True)
-            colour = ("brown", "light_gray", "green")[i]
-            self.put(sx + 1, G, z0, s(f"{colour}_bed", facing="north", part="head", occupied=False), built=False, keep=True)
-            self.put(sx + 1, G, z0 + 1, s(f"{colour}_bed", facing="north", part="foot", occupied=False), built=False,
-                     keep=True)
-        # firewood, stores, a work spot
-        self.box(x1 - 1, G, z1 - 2, x1, G + 1, z1, s("oak_log", axis="z"), built=False, keep=True)
-        self.put(x1 - 3, G, z1, s("barrel", facing="up", open=False), built=False, keep=True)
-        self.put(x1 - 4, G, z1, s("hay_block", axis="y"), built=False, keep=True)
-        self.put(x1 - 4, G + 1, z1, s("hay_block", axis="y"), built=False, keep=True)
-        self.put(x0 + 1, G, z1, s("crafting_table"), built=False, keep=True)
-        self.put(x0 + 2, G, z1, s("composter", level=3), built=False, keep=True)
-        self.put(x0 + 7, G, z0 + 5, s("campfire", lit=True, facing="north", signal_fire=False, waterlogged=False),
+        self.tent(x0, z0, "smooth_sandstone", "brown", 2)
+        self.tent(x0 + 6, z0, "smooth_quartz", "green", 1)
+        self.box(x1 - 1, G, z0, x1, G + 1, z0 + 3, s("oak_log", axis="z"), built=False, keep=True)
+        self.put(-26, G, -10, s("campfire", lit=True, facing="north", signal_fire=False, waterlogged=False),
                  built=False, keep=True)
-        for x, z in ((x0 + 6, z0 + 6), (x0 + 8, z0 + 4)):
-            self.put(x, G, z, s("stripped_spruce_log", axis="x"), built=False, keep=True)
+        for x in (-28, -24):
+            self.put(x, G, -10, s("stripped_spruce_log", axis="z"), built=False, keep=True)
+        self.put(-23, G, -7, s("crafting_table"), built=False, keep=True)
+        self.put(-22, G, -7, s("barrel", facing="up", open=False), built=False, keep=True)
+        self.box(-21, G, -7, -21, G + 1, -7, s("hay_block", axis="y"), built=False, keep=True)
+        self.put(-20, G, -7, s("composter", level=3), built=False, keep=True)
         # a watered garden: wheat, carrots, potatoes
-        gx0, gz0 = x0 + 1, z1 - 3
-        for x in range(gx0, gx0 + 7):
-            for z in range(gz0, gz0 + 2):
+        for x in range(-33, -27):
+            for z in (-8, -7):
                 self.put(x, G - 1, z, s("farmland", moisture=7), built=False, keep=True)
-                crop = ("wheat", "carrots", "potatoes")[(x - gx0) // 3 % 3]
+                crop = ("wheat", "carrots", "potatoes")[(x + 33) // 2]
                 self.put(x, G, z, s(crop, age=int(rng.integers(2, 8))), built=False, keep=True)
-        self.put(gx0 + 3, G - 1, gz0 - 1, m["water"], built=False, keep=True)
-        self.put(gx0 + 3, G, gz0 - 1, AIR, built=False)
+        self.put(-31, G - 1, -9, m["water"], built=False, keep=True)
         self.claim(x0 - 2, z0 - 2, x1 + 2, z1 + 2, 1.0)
+
+    def tent(self, x0, z0, canvas, bed, beds):
+        """A canvas A-frame, five wide and four deep, open to the south, with bedrolls inside.
+        Stairs make the sloped canvas; a slab is the ridge."""
+        s = self.g.s
+        back = s({"smooth_sandstone": "white_wool", "smooth_quartz": "white_wool"}[canvas])
+        for z in range(z0, z0 + 4):
+            self.put(x0, G, z, self.stairs(canvas, "east"), built=False, keep=True)
+            self.put(x0 + 4, G, z, self.stairs(canvas, "west"), built=False, keep=True)
+            self.put(x0 + 1, G + 1, z, self.stairs(canvas, "east"), built=False, keep=True)
+            self.put(x0 + 3, G + 1, z, self.stairs(canvas, "west"), built=False, keep=True)
+            self.put(x0 + 2, G + 2, z, self.slab(canvas), built=False, keep=True)
+        self.box(x0 + 1, G, z0, x0 + 3, G, z0, back, built=False, keep=True)
+        self.put(x0 + 2, G + 1, z0, back, built=False, keep=True)
+        pole = s("birch_fence", north=False, east=False, south=False, west=False, waterlogged=False)
+        self.box(x0 + 2, G, z0 + 4, x0 + 2, G + 1, z0 + 4, pole, built=False, keep=True)
+        self.put(x0 + 2, G + 2, z0 + 4, self.slab(canvas), built=False, keep=True)
+        for bx in ((x0 + 1, x0 + 3) if beds == 2 else (x0 + 2,)):
+            self.put(bx, G, z0 + 1, s(f"{bed}_bed", facing="north", part="head", occupied=False), built=False, keep=True)
+            self.put(bx, G, z0 + 2, s(f"{bed}_bed", facing="north", part="foot", occupied=False), built=False, keep=True)
 
     # ---------- the Convergence Spire and its broken ring ----------
     def spire(self):
@@ -422,6 +567,7 @@ class City:
                     self.put(bx, hgt + 1, bz, self.slab("create:cut_limestone_brick"))
         door = (np.abs(lx) <= 1) & (lz >= 6) & (lz <= 11)
         self.g.column_mask(door, G, G + 4, AIR, built=False)
+        self.sign(cx, G + 5, cz + 9, "south", ["CONVERGENCE", "SPIRE", "", "NO ENTRY"])
         self.ring_standing(cx, cz)
         self.ring_fallen(cx, cz)
         self.claim(-26, -84, 44, -32, 0.8, G + 76)
@@ -528,6 +674,8 @@ class City:
                     self.put(x, G - 1, z, m["lime_pol"], built=False)
                     self.put(x, G, z, m["lime_pol"], keep=True)
         self.box(fx, G, fz, fx, G + 2, fz, m["cu_ch"], keep=True)
+        self.sign(fx + 1, G + 1, fz, "east", ["MARKET OF", "SEVEN ROADS"])
+        self.sign(fx - 1, G + 1, fz, "west", ["MARKET OF", "SEVEN ROADS"])
         self.put(fx, G + 3, fz, m["cu_block"], keep=True)
         # old stalls: tuff posts, a limestone counter and a stone awning
         for sx in (49, 55, 63, 69):
@@ -544,6 +692,7 @@ class City:
                                               waterlogged=False) if rng.random() < .6 else
                                  s("barrel", facing="up", open=False))
         self.claim(x0 - 2, z0 - 2, x1 + 2, z1 + 2, 0.55, G + 8)
+        self.site("market", "The Market", 2, self.rect(x0 - 2, z0 - 2, x1 + 2, z1 + 2))
 
     # ---------- the Grave Warden's mausoleum, crypt and graveyard ----------
     def crypt(self):
@@ -564,6 +713,7 @@ class City:
         self.box(x0, G + 6, -11, x1, G + 6, -9, self.slab("deepslate_tile"), keep=True)
         self.box(-61, G - 1, -9, -57, G - 1, -8, m["ds_pol"], built=False)
         self.box(-60, G, z1, -58, G + 3, z1, AIR, built=False)
+        self.sign(-59, G + 4, z1 + 1, "south", ["HERE THEY", "WAIT"], "dark_oak")
         # stair down to the crypt, running north
         for k in range(7):
             z = -14 - k
@@ -583,14 +733,14 @@ class City:
                     rot = 12 if face == "east" else 4
                     self.put(x, fy + 2, z, s("skeleton_skull", rotation=rot, powered=False), keep=True)
                 else:
-                    self.put(x, fy + 2, z, s("candle", candles=int(rng.integers(1, 5)), lit=False,
+                    self.put(x, fy + 2, z, s("candle", candles=int(rng.integers(2, 5)), lit=True,
                                              waterlogged=False), keep=True)
         for x in (cx0 + 3, cx1 - 3):
             for z in (cz0 + 3, cz1 - 4):
                 self.box(x, fy + 1, z, x, G - 4, z, m["ds_pol"], keep=True)
         self.box(-60, fy + 1, -30, -58, fy + 1, -27, m["ds_pol"], keep=True)  # the sarcophagus
         self.box(-60, fy + 2, -30, -58, fy + 2, -27, self.slab("polished_deepslate"), keep=True)
-        for x, z in ((-62, -24), (-56, -24), (-62, -31), (-56, -31)):
+        for x, z in ((-63, -23), (-55, -23), (-63, -27), (-55, -27), (-63, -31), (-55, -31), (-59, -34)):
             self.put(x, G - 4, z, s("chain", axis="y", waterlogged=False), keep=True)
             self.put(x, G - 5, z, s("soul_lantern", hanging=True, waterlogged=False), keep=True)
         # graveyard on the ground above the crypt
@@ -608,6 +758,7 @@ class City:
                                             waterlogged=False)
         self.g.built[:, G, :][edge & ~gate] = True
         self.claim(-82, -42, -44, -6, 0.75)
+        self.site("crypt", "The Grave Warden's Crypt", 3, self.rect(-82, -42, -44, -6))
 
     # ---------- the airship mooring mast ----------
     def mast(self):
@@ -630,6 +781,7 @@ class City:
         for y in range(top - 12, top - 2):
             self.put(cx + 11, y, cz, s("chain", axis="y", waterlogged=False), keep=True)
         self.claim(cx - 6, cz - 6, cx + 13, cz + 6, 0.85, G + 45)
+        self.site("mast", "The Mooring Mast", 3, self.rect(cx - 6, cz - 6, cx + 13, cz + 6))
 
     # ---------- the outer wall ----------
     def walls(self):
@@ -663,6 +815,11 @@ class City:
             self.g.column_mask(port & (side <= 2), G + 4, G + 6, m["grate"])
             near = band & (np.abs(((th - ang + 180) % 360) - 180) < 12)
             self.integrity[near] = 0.97
+            gname = {0: "east", 90: "south", 180: "west", -90: "north"}[ang]
+            window = (r >= 78.5) & (r <= 91) & (np.abs(((th - ang + 180) % 360) - 180) < 14)
+            self.site(f"gate_{gname}", f"The {gname.title()} Gate", 2, window, self.props_gate(ang))
+            self.sign(int(round(86 * math.cos(math.radians(ang)))), G + 8, int(round(86 * math.sin(math.radians(ang)))),
+                      toward(math.cos(math.radians(ang)), math.sin(math.radians(ang))), ["", f"{gname.upper()} GATE"])
             for off in (-1, 1):
                 a = math.radians(ang + off * 7)
                 self.tower(84 * math.cos(a), 84 * math.sin(a), 4.5, G + 14, cap=False, integrity=0.93)
@@ -869,6 +1026,8 @@ class City:
     # ---------- time ----------
     def decay(self):
         g, rng = self.g, self.rng
+        self.pre_a = g.a.copy()  # the city as designed, before time: restoration rebuilds from this
+        self.removed = np.zeros(g.shape, bool)
         before = g.built & (g.a > AIR)
         cand = before & ~g.keep
         cand[:, :G, :] = False
@@ -885,6 +1044,7 @@ class City:
         hf = np.clip((ys - G) / np.maximum(self.htop[:, None, :] - G, 4), 0, 1)
         p_remove = np.clip((1 - integ) * 0.5 - 0.05 + 0.62 * hf ** 1.2, 0, 0.95)
         gone = cand & (q < p_remove)
+        self.removed |= gone
         g.a[gone] = AIR
         g.built[gone] = False
         removed = (gone.sum(axis=1)).astype(np.float32)
@@ -900,6 +1060,7 @@ class City:
         height = spread * 0.45 + rng.random(spread.shape) * 0.6
         mix = [m["lime"], m["lime_raw"], m["cobble"], m["gravel"], m["tuff"], m["lime_layer"], m["andesite"]]
         tops = [self.slab("create:cut_limestone"), self.slab("tuff_brick"), m["moss"], self.slab("cobblestone")]
+        sus = self.g.s("suspicious_gravel", dusted=0)
         xs, zs = np.nonzero(height >= 1)
         for x, z in zip(xs.tolist(), zs.tolist()):
             h = min(int(height[x, z]), 3)
@@ -908,7 +1069,11 @@ class City:
             for k in range(h):
                 if g.a[x, G + k, z] != AIR:
                     break
-                g.a[x, G + k, z] = tops[int(rng.integers(0, 4))] if k == h - 1 else mix[int(rng.integers(0, 7))]
+                st = tops[int(rng.integers(0, 4))] if k == h - 1 else mix[int(rng.integers(0, 7))]
+                if st == m["gravel"] and rng.random() < 0.15:  # brush it for what's buried
+                    st = sus
+                    g.block_nbt[(x, G + k, z)] = {"id": "minecraft:brushable_block", "LootTable": "remnant:ruins/rubble"}
+                g.a[x, G + k, z] = st
 
     def weather(self):
         m, g, rng = self.m, self.g, self.rng
@@ -933,6 +1098,7 @@ class City:
         nb[:, :, 1:] += solid[:, :, :-1]
         nb[:, :, :-1] += solid[:, :, 1:]
         drop = b & below_air & (nb < 2)
+        self.removed |= drop
         g.a[drop] = AIR
         g.built[drop] = False
 
@@ -958,6 +1124,7 @@ class City:
                 break
             count = n
         loose = solid & ~reach & g.built & ~g.keep
+        self.removed |= loose
         g.a[loose] = AIR
         g.built[loose] = False
         self.notes.append(f"{int(loose.sum())} loose blocks dropped")
@@ -1072,8 +1239,80 @@ class City:
         self.walls()
         self.districts()
         self.decay()
+        self.place_signs()
         self.overgrowth()
         self.connect()
+
+
+BE_BLOCKS = {"minecraft:sign": "_sign", "minecraft:brushable_block": "suspicious_", "minecraft:barrel": "barrel",
+             "minecraft:decorated_pot": "decorated_pot"}
+
+
+def prune_block_nbt(g):
+    """Drop block-entity data whose block was later replaced by something else."""
+    for (x, y, z), be in list(g.block_nbt.items()):
+        if BE_BLOCKS.get(be["id"], "~") not in g.pal[int(g.a[x, y, z])]:
+            del g.block_nbt[(x, y, z)]
+
+
+def write_site(city, name, out_dir):
+    """A site's restoration as layered structure templates plus functions that place them a few at a time."""
+    g, site = city.g, city.sites[name]
+    new = city.restore(name)
+    diff = new != g.a
+    if not diff.any():
+        return 0
+    cols = site["mask"]
+    xs, zs = np.nonzero(cols.any(axis=1))[0], np.nonzero(cols.any(axis=0))[0]
+    x0, x1, z0, z1 = int(xs.min()), int(xs.max()) + 1, int(zs.min()), int(zs.max()) + 1
+    ys = np.nonzero(diff.any(axis=(0, 2)))[0]
+    tdir = os.path.join(out_dir, "data", "remnant", "structure", "core", "site")
+    fdir = os.path.join(out_dir, "data", "remnant", "function", "restore", name)
+    os.makedirs(tdir, exist_ok=True)
+    os.makedirs(fdir, exist_ok=True)
+    at = "execute at @e[type=minecraft:marker,tag=remnant_core,limit=1] run"
+    ox, oy, oz = x0 - R, -(G - 1), z0 - R
+    cx, cz = int((x0 + x1) / 2) - R, int((z0 + z1) / 2) - R
+    levels = list(range(int(ys.min()), int(ys.max()) + 1, 3))
+    for k, y0 in enumerate(levels):
+        part = np.full(g.shape, VOID, np.uint16)
+        sel = diff.copy()
+        sel[:, :y0, :] = False
+        sel[:, y0 + 3:, :] = False
+        part[sel] = new[sel]
+        ns = types.SimpleNamespace(a=part, pal=g.pal, block_nbt={})
+        Grid.write_structure(ns, os.path.join(tdir, f"{name}_{k}.nbt"), x0, x1, z0, z1)
+        cy = y0 - (G - 1)
+        lines = [f"{at} place template remnant:core/site/{name}_{k} ~{ox} ~{oy} ~{oz}",
+                 f"{at} playsound minecraft:block.stone.place block @a ~{cx} ~{cy} ~{cz} 4 0.6",
+                 f"{at} particle minecraft:poof ~{cx} ~{cy + 1} ~{cz} {(x1 - x0) / 4:.1f} 1 {(z1 - z0) / 4:.1f} 0.02 120"]
+        if k + 1 < len(levels):
+            lines.append(f"schedule function remnant:restore/{name}/{k + 1} 8t")
+        else:
+            lines += [f'tellraw @a {{"text":"{site["label"]} stands again.","color":"gold"}}',
+                      "playsound minecraft:ui.toast.challenge_complete master @a"]
+        with open(os.path.join(fdir, f"{k}.mcfunction"), "w") as f:
+            f.write("\n".join(lines) + "\n")
+    with open(os.path.join(fdir, "..", f"{name}.mcfunction"), "w") as f:
+        f.write(f"# Restore {site['label']} (Age {site['age']}), layer by layer over a few seconds.\n"
+                f"# Needs the core's marker: summon minecraft:marker on the Hearth's ground block, tagged remnant_core.\n"
+                f"function remnant:restore/{name}/0\n")
+    return int(diff.sum())
+
+
+LOOT = {
+    "house": {"type": "minecraft:chest", "pools": [{"rolls": {"min": 1, "max": 4}, "entries": [
+        {"type": "minecraft:item", "name": n, "weight": w,
+         "functions": [{"function": "minecraft:set_count", "count": {"min": 1, "max": c}}]}
+        for n, w, c in (("minecraft:bone", 10, 3), ("minecraft:string", 8, 3), ("minecraft:paper", 8, 3),
+                        ("minecraft:flint", 8, 2), ("minecraft:iron_nugget", 6, 4), ("minecraft:copper_ingot", 4, 2),
+                        ("minecraft:candle", 4, 2), ("minecraft:amethyst_shard", 3, 2), ("minecraft:book", 1, 1))]}]},
+    "rubble": {"type": "minecraft:archaeology", "pools": [{"rolls": 1, "entries": [
+        {"type": "minecraft:item", "name": n, "weight": w}
+        for n, w in (("minecraft:flint", 6), ("minecraft:bone", 4), ("minecraft:iron_nugget", 4),
+                     ("minecraft:paper", 3), ("minecraft:amethyst_shard", 3), ("minecraft:copper_ingot", 2),
+                     ("minecraft:brewer_pottery_sherd", 1), ("minecraft:archer_pottery_sherd", 1))]}]},
+}
 
 
 class View:
@@ -1122,9 +1361,18 @@ def main():
             plan(g, assets, G).save(os.path.join(a.out, "plan.png"))
             iso(g, assets, scale=4).save(os.path.join(a.out, "iso.png"))
             iso(View(g, R - 46, R + 46, R - 46, R + 40), assets, scale=9).save(os.path.join(a.out, "iso_centre.png"))
+    prune_block_nbt(g)
     g.write_schem(os.path.join(a.out, "core.schem"), offset=(-R, -G, -R))
     tiles = os.path.join(a.out, "datapack", "data", "remnant", "structure", "core")
     os.makedirs(tiles, exist_ok=True)
+    dp = os.path.join(a.out, "datapack")
+    for table, body in LOOT.items():  # placeholders until the lore items (Torn Pages, Memory Shards) exist
+        ldir = os.path.join(dp, "data", "remnant", "loot_table", "ruins")
+        os.makedirs(ldir, exist_ok=True)
+        with open(os.path.join(ldir, f"{table}.json"), "w") as f:
+            json.dump(body, f, indent=1)
+    for name in city.sites:
+        print(f"site {name}: {write_site(city, name, dp)} blocks change when restored")
     with open(os.path.join(a.out, "datapack", "pack.mcmeta"), "w") as f:
         f.write('{"pack": {"pack_format": 48, "description": "Remnant city core (generated)"}}\n')
     step = 97
