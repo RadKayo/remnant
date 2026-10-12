@@ -2,19 +2,20 @@
 
 `citygen.py` builds Remnant's ruined city core, the Ascendancy city the group restores at spawn, as blocks. It's all our own work, so the output can ship with the pack.
 
-What it builds, centred on the Hearth:
+What it builds, centred on the Hearth. The Ascendancy was a high-tech aether civilisation, and its city looks it: white quartz, dark iron, violet glass, verdigris copper, and aether-crystal conduits that are dark now and can be made to glow again.
 
-- **The plaza and the Hearth:** ringed paving, a sunken fire pit with an unlit copper brazier for the players to rekindle, benches and copper lamps.
-- **The Elder's house:** the one roofed building, patched with Remnant timber. Beside it is the Remnant camp, with shelters, bedrolls, firewood, a lit campfire and a watered garden.
-- **Streets:** four avenues to four gates, a ring road and diagonal lanes.
-- **The Convergence Spire:** an octagonal tower with an amethyst aether core. The great copper ring is threaded through it, broken away at the upper right, and the missing arc lies in two pieces east of the Spire, still growing aether crystal.
-- **The market:** a double colonnade around a fountain on the east avenue, with old stalls.
-- **The Grave Warden's mausoleum:** a stair down to a burial crypt with niches and soul lanterns, and a graveyard above.
+- **The plaza and the Hearth:** ringed paving with aether lines converging on a sunken fire ring, and an unlit copper brazier for the players to rekindle. Beside it are the Elder's house and the Storehouse, both patched with Remnant timber, and the Remnant camp of tents, fire and garden.
+- **Streets:** four avenues to four gates, a ring road and diagonal lanes, with violet conduit lines down their middles, light pylons along the avenues, and an elevated monorail on quartz pillars over the ring road, partly fallen.
+- **Habitation towers:** round quartz shafts that taper as they rise, with thin iron ribs, ribbon windows of violet or clear glass, white ledges, glass-railed balconies, a conduit seam, a glass dome with a copper halo, and an antenna.
+- **Terraced halls:** tiers stepping back from the street, each with a full-height glass front under a thin overhanging roof plate, chamfered corners, ribbon windows, planted terraces and a roof garden.
+- **The Convergence Spire:** an octagonal tower with an amethyst aether core. The great copper ring is threaded through it and broken away, and the missing arc lies in two pieces nearby.
+- **The market:** a quartz colonnade with an iron architrave under a glass canopy, around a fountain.
+- **The Grave Warden's mausoleum:** a crypt below it, and a graveyard above.
 - **The mooring mast** for the Age of Steam airships.
-- **The outer wall:** gatehouses with portcullises, corner towers with copper caps, and three breaches.
-- **Lots:** ruined houses (row houses along the avenues and the ring road, more behind), empty district plots for later restoration, gardens and rubble.
+- **The outer wall:** dark tile with quartz bands and its own aether line. A great copper ring is set into each gatehouse, and the corner towers carry ward pylons, quartz obelisks crowned with aether crystal.
+- **Free plots** for anyone to build on.
 
-The materials are cream limestone (Create), grey tuff, verdigris copper and amethyst. Decay comes from noise: ground floors mostly stand, roofs mostly don't, and landmarks break in big collapses rather than pinholes. Rubble piles up where blocks fell, and anything cut loose from the ground is dropped. Grass, moss, vines, glow lichen and a few trees grow over it.
+Decay comes from noise. Ground floors mostly stand while roofs and upper floors mostly don't. Landmarks and towers break in large clean collapses, and houses take smaller holes. Rubble piles up where blocks fell, and anything cut loose from the ground is dropped. Quartz weathers to calcite and iron rusts. Grass, moss, vines, glow lichen and a few trees grow over it.
 
 Inside the ruins:
 
@@ -35,7 +36,12 @@ The group restores the city in front of everyone. There are two kinds of site:
 
 Every site is built from the same design as the ruin:
 
-- What fell is put back in the materials of the Age the group is in when they finish it. Walls go back as mud brick in Age I, cobblestone in Age II, stone brick in Age III, brick in Age IV and the original stone in Age V. Floors and roofs are mud brick, then spruce, then stone. Salvaged metal goes back as it was.
+- What fell is put back in the materials of the Age the group is in when they finish it. Repairs match the old stone's tone but not its finish, so you can see what was mended.
+  - Pale stone is patched with mud brick in Age I, calcite in Age II, polished diorite in Age III and quartz bricks in Age IV.
+  - Dark stone and metal are patched with cobbled deepslate, then deepslate bricks, then polished deepslate.
+  - Floors and roofs are mud brick, then spruce, then stone.
+  - Age V restores the original, and the dead aether conduits glow again (pearlescent froglight).
+  - Salvaged metal and glass go back as they were.
 - Rubble, vines and moss are cleared, while grass and flowers stay.
 - Landmarks add their own touches: the Hearth's brazier is lit, the gates get torches and banners, and the market gets a bell for the townsfolk to gather at.
 
