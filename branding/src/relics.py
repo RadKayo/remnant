@@ -273,6 +273,20 @@ def stasis_pylon(ae):
     return [layer(base), layer(column, form="cylv"), layer(seam, form="none", shadow="inset"), layer(crystal)]
 
 
+def aether_cell(ae, f=0):
+    """The Aether Cell that awakens a relic: a glass vial in copper caps. Crafted empty, charged in AE2's Charger."""
+    glass = {(x, y): ("quartz", 4) for x in (5, 10) for y in range(4, 13)}
+    fill = {(x, y): (ae, 3) for x in range(6, 10) for y in range(4, 13)} if ae == "aether" else {}
+    if ae == "aether":
+        for x in range(6, 10):
+            fill[(x, 4 + (f * 2) % 8)] = (ae, 5)  # a bubble rising
+    caps = {}
+    caps.update({(x, y): ("copper", 3) for x in range(4, 12) for y in (2, 3, 13, 14)})
+    caps.update({(x, 1): ("copper", 4) for x in range(6, 10)})
+    bands = {(x, 8): ("iron", 3) for x in (5, 10)}
+    return [layer(fill, form="cylv", shadow="none"), layer(glass, form="none"), layer(caps, form="cylv"), layer(bands, form="none")]
+
+
 # id, name, how it fights, signature, drawing function (some take a frame for their animation)
 RELICS = [
     ("aether_blade", "Aether Blade", "Longsword", "Hits leave aether sparks; a dash strike closes the gap", aether_blade),
@@ -322,6 +336,17 @@ def main():
         with open(f"{OUT}/{rid}.png.mcmeta", "w") as fh:
             fh.write('{"animation": {"frametime": 5, "interpolate": false}}\n')
         cards.append((name, kind, sig, sealed, frames[1]))
+    empty = render(aether_cell("aether_dead"))
+    empty.save(f"{OUT}/aether_cell_empty.png")
+    cell_frames = [draw(aether_cell, "aether", f) for f in range(4)]
+    strip = Image.new("RGBA", (16, 64))
+    for i, fr in enumerate(cell_frames):
+        strip.paste(fr, (0, 16 * i))
+    strip.save(f"{OUT}/aether_cell.png")
+    with open(f"{OUT}/aether_cell.png.mcmeta", "w") as fh:
+        fh.write('{"animation": {"frametime": 5, "interpolate": false}}\n')
+    cards.append(("Aether Cell", "Awakens a relic", "Crafted empty from amethyst, quartz and copper; charged in an AE2 Charger",
+                  empty, cell_frames[1]))
 
     cols, scale, pad = 4, 7, 30
     tile = 16 * scale
