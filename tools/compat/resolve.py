@@ -79,7 +79,7 @@ PLAN = [
     ("ruins", "Towns and Towers", ["towns-and-towers"], None, ""),
     ("ruins", "Explorify", ["explorify"], None, ""),
     ("ruins", "Lootr", ["lootr"], "lootr", ""),
-    ("ruins", "Ember's Ancient Remnants", [], 1624753, "reskinned as Ascendancy ruins by datapacks/remnant_ruins (Oct 12)"),
+    ("ruins", "Ember's Ancient Remnants", [], "1624753", "reskinned as Ascendancy ruins by datapacks/remnant_ruins (Oct 12)"),
     ("ruins", "End Remastered", ["end-remastered", "endrem"], "endrem", ""),
     ("ruins", "Explorer's Compass", ["explorers-compass"], "explorers-compass", ""),
     ("ruins", "Xaero's Minimap", ["xaeros-minimap"], "xaeros-minimap", ""),
