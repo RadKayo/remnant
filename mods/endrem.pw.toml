@@ -1,0 +1,13 @@
+name = "End Remastered"
+filename = "endrem-neoforge-1.21.1-6.3.0.jar"
+side = "both"
+
+[download]
+url = "https://cdn.modrinth.com/data/ZJTGwAND/versions/Xzg42PX9/endrem-neoforge-1.21.1-6.3.0.jar"
+hash-format = "sha512"
+hash = "c378f7ae17e1b4a95cc597d365ad3aafac01836042bb70738486f94c82eec347ae44d54182cdd69fb495dd65891fa4b1a7a555e2fb637bdf6fc830e3f9b9d7ee"
+
+[update]
+[update.modrinth]
+mod-id = "ZJTGwAND"
+version = "Xzg42PX9"

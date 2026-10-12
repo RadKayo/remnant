@@ -1,0 +1,13 @@
+name = "Cataclysm Dimension"
+filename = "cataclysm_dimension-1.21.1-1.5.1.jar"
+side = "both"
+
+[download]
+url = "https://cdn.modrinth.com/data/JWCzrgCa/versions/CsvUgixe/cataclysm_dimension-1.21.1-1.5.1.jar"
+hash-format = "sha512"
+hash = "4f7d33e7bcd8a3c3289dd2e401331c1019e038aa48676f01d6ffb74933f96109095159cc2131ff16a5004d7423280f6ad2d55d377cd8d0e21f4372521175d7f8"
+
+[update]
+[update.modrinth]
+mod-id = "JWCzrgCa"
+version = "CsvUgixe"

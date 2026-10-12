@@ -1,0 +1,13 @@
+name = "Modpack Core Essentials"
+filename = "MCE_neoforge_1.21.1.jar"
+side = "client"
+
+[download]
+url = "https://cdn.modrinth.com/data/GRYu7wWv/versions/WDE820P5/MCE_neoforge_1.21.1.jar"
+hash-format = "sha512"
+hash = "a5bc65b15889532df2e7d381873d7a92124c10cb0b49446f5d0c1fc84e58e38223a63c59d23c6de2ea955c4bcc2b1d6050a44554f68d8f416e9e653725ea903e"
+
+[update]
+[update.modrinth]
+mod-id = "GRYu7wWv"
+version = "WDE820P5"

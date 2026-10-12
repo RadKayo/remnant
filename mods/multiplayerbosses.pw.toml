@@ -1,0 +1,13 @@
+name = "Multiplayer Bosses"
+filename = "multiplayerbosses-neoforge-1.21.1-1.0.0.jar"
+side = "both"
+
+[download]
+url = "https://cdn.modrinth.com/data/NM5vwUDS/versions/KM9T7wJh/multiplayerbosses-neoforge-1.21.1-1.0.0.jar"
+hash-format = "sha512"
+hash = "da3158fbd13d234a02fcd38c04528d03822b4a9871ef449f4d7b4ce0f5abf1dbcc9a8c52066988e65d115931fcb63076337070428ea98505db1f9d1c27022979"
+
+[update]
+[update.modrinth]
+mod-id = "NM5vwUDS"
+version = "KM9T7wJh"

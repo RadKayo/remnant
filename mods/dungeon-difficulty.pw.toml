@@ -1,0 +1,13 @@
+name = "Dungeon Difficulty"
+filename = "dungeon_difficulty-neoforge-3.9.2+1.21.1.jar"
+side = "both"
+
+[download]
+url = "https://cdn.modrinth.com/data/ENZmbSFZ/versions/uwoMCnrI/dungeon_difficulty-neoforge-3.9.2%2B1.21.1.jar"
+hash-format = "sha512"
+hash = "98bbb3fb956ba5ad5904a5ebdebf33bdff2bae3d0a438ccc8abced7d2f61f99c1d9b71828fbc807c3d2e4b85cbb753ae1b9dc6384a1dd4ed0fbb1e172679fa37"
+
+[update]
+[update.modrinth]
+mod-id = "ENZmbSFZ"
+version = "uwoMCnrI"

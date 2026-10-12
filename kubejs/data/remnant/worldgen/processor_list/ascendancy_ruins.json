@@ -1,0 +1,63 @@
+{
+  "processors": [
+    {
+      "processor_type": "lithostitched:block_swap",
+      "blocks": {
+        "minecraft:stone_bricks": "minecraft:quartz_bricks",
+        "minecraft:mossy_stone_bricks": "minecraft:calcite",
+        "minecraft:cobblestone": "minecraft:polished_diorite",
+        "minecraft:mossy_cobblestone": "minecraft:smooth_quartz",
+        "minecraft:stone": "minecraft:smooth_quartz",
+        "minecraft:andesite": "minecraft:polished_diorite",
+        "minecraft:stone_brick_stairs": "minecraft:polished_deepslate_stairs",
+        "minecraft:stone_brick_slab": "minecraft:polished_deepslate_slab",
+        "minecraft:stone_brick_wall": "minecraft:polished_deepslate_wall",
+        "minecraft:mossy_stone_brick_stairs": "minecraft:deepslate_brick_stairs",
+        "minecraft:mossy_stone_brick_slab": "minecraft:deepslate_brick_slab",
+        "minecraft:mossy_stone_brick_wall": "minecraft:deepslate_brick_wall",
+        "minecraft:cobblestone_stairs": "minecraft:polished_diorite_stairs",
+        "minecraft:cobblestone_slab": "minecraft:polished_diorite_slab",
+        "minecraft:cobblestone_wall": "minecraft:diorite_wall",
+        "minecraft:mossy_cobblestone_stairs": "minecraft:smooth_quartz_stairs",
+        "minecraft:mossy_cobblestone_slab": "minecraft:smooth_quartz_slab",
+        "minecraft:mossy_cobblestone_wall": "minecraft:diorite_wall",
+        "minecraft:stone_stairs": "minecraft:smooth_quartz_stairs",
+        "minecraft:stone_slab": "minecraft:smooth_quartz_slab",
+        "minecraft:andesite_stairs": "minecraft:polished_diorite_stairs",
+        "minecraft:andesite_slab": "minecraft:polished_diorite_slab",
+        "minecraft:deepslate": "minecraft:polished_deepslate"
+      }
+    },
+    {
+      "processor_type": "minecraft:rule",
+      "rules": [
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:random_block_match",
+            "block": "minecraft:quartz_bricks",
+            "probability": 0.015
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "Name": "minecraft:amethyst_block"
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:random_block_match",
+            "block": "minecraft:smooth_quartz",
+            "probability": 0.025
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "Name": "minecraft:amethyst_block"
+          }
+        }
+      ]
+    }
+  ]
+}

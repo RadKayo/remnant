@@ -1,0 +1,13 @@
+name = "Ember's Ancient Remnants"
+filename = "ancient_remnants-1.0.2.2-neoforge.jar"
+side = "server"
+
+[download]
+hash-format = "sha1"
+hash = "6587e3c8c134a0447edabd29977d280df8450080"
+mode = "metadata:curseforge"
+
+[update]
+[update.curseforge]
+file-id = 8906834
+project-id = 1624753

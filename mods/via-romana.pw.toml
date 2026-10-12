@@ -1,0 +1,13 @@
+name = "Via Romana"
+filename = "via_romana-2.2.3+1.21.1-neoforge.jar"
+side = "both"
+
+[download]
+url = "https://cdn.modrinth.com/data/FVToiKwr/versions/I7nIGnGB/via_romana-2.2.3%2B1.21.1-neoforge.jar"
+hash-format = "sha512"
+hash = "2a9b28661deedddfaf2d223fcb394b0df6bf58d4cc8db6ed10e00eb051e816d0c92c65c5462efb4186af62e498a9836f98f7f8d93d443f7e9711c88151c8e7a9"
+
+[update]
+[update.modrinth]
+mod-id = "FVToiKwr"
+version = "I7nIGnGB"

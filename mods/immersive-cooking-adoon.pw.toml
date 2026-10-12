@@ -1,0 +1,13 @@
+name = "Immersive Cooking & Farming"
+filename = "immersivecooking-1.21.1-0.2.0-beta-1.jar"
+side = "both"
+
+[download]
+url = "https://cdn.modrinth.com/data/FzJEChtX/versions/FmMuj0xg/immersivecooking-1.21.1-0.2.0-beta-1.jar"
+hash-format = "sha512"
+hash = "96218a6fbb81acd68c7fc389625eb522ef188b1b6ffb35d3597f87f9db5221572948ae8bdb8959c4cfa78db9ab86edd38d6edc787ea1adae363ca7e3a87a6b41"
+
+[update]
+[update.modrinth]
+mod-id = "FzJEChtX"
+version = "FmMuj0xg"

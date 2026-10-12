@@ -1,0 +1,13 @@
+name = "Let's Do Bakery"
+filename = "letsdo-bakery-neoforge-2.1.9.jar"
+side = "both"
+
+[download]
+url = "https://cdn.modrinth.com/data/oNB5jhlA/versions/cUr3it8I/letsdo-bakery-neoforge-2.1.9.jar"
+hash-format = "sha512"
+hash = "f643c95c6c3a8638899e84f9081fd30eb526796c6fccfad475bf2151a7aa790a54606ae36374194765c1a1c57c856695ee40cbf5c29effd58c5e3c6383c474a7"
+
+[update]
+[update.modrinth]
+mod-id = "oNB5jhlA"
+version = "cUr3it8I"

@@ -1,0 +1,13 @@
+name = "CombatEventFix"
+filename = "combateventfix-1.0.1.jar"
+side = "both"
+
+[download]
+url = "https://cdn.modrinth.com/data/KDSRJfNj/versions/lLxGd0WZ/combateventfix-1.0.1.jar"
+hash-format = "sha512"
+hash = "66ea1164dc2871bb7dd7d671cb37de73aa3242182345f9d7daff768863c830fb15cb76301e7a39a8938eb4cf14903ea0f5f460944a2be77779ac4932fda042d9"
+
+[update]
+[update.modrinth]
+mod-id = "KDSRJfNj"
+version = "lLxGd0WZ"

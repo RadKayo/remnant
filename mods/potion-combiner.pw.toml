@@ -1,0 +1,13 @@
+name = "Potion Combiner"
+filename = "potion_blending-1.21.1-Neoforge-1.0.1.jar"
+side = "both"
+
+[download]
+url = "https://cdn.modrinth.com/data/gCV2e3CO/versions/3GqOkJFR/potion_blending-1.21.1-Neoforge-1.0.1.jar"
+hash-format = "sha512"
+hash = "2d089878dd83e597db209c2fc47bb1d52523db6f39249bbe51cfe4c20231df753fccb96d97821a21d3578622caeb89d51f3dab7245664d02f5382f48bfebc8b1"
+
+[update]
+[update.modrinth]
+mod-id = "gCV2e3CO"
+version = "3GqOkJFR"

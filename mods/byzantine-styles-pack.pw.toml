@@ -1,0 +1,13 @@
+name = "Byzantine Styles Pack"
+filename = "Byzantine-1.21.1-51.1.jar"
+side = "both"
+
+[download]
+hash-format = "sha1"
+hash = "88cc489d75b7e6447b34cdd84e66df5f533cd196"
+mode = "metadata:curseforge"
+
+[update]
+[update.curseforge]
+file-id = 9002815
+project-id = 974855

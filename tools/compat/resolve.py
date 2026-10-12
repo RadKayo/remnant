@@ -12,6 +12,15 @@ import urllib.parse
 import urllib.request
 
 UA = {"User-Agent": "RadKayo/remnant-compat-audit (github.com/RadKayo/remnant)"}
+
+# Modrinth dependencies listed by mistake on NeoForge builds (the jars' own metadata is what counts)
+IGNORE_DEPS = {"P7dR8mSH"}  # Fabric API: listed by Via Romana and Auto HUD
+
+# Exact versions we hold back to, and why
+PINS = {
+    "Distant Horizons": ("3.3.2-1.21.1", "3.3.3 crashes on Chunky's generation hook"),
+    "Iris": ("1.8.14-beta.1+1.21.1-neoforge", "1.8.12 refuses Sodium 0.8.13"),
+}
 LOADER, MC = "neoforge", "1.21.1"
 
 # (group, display name, candidate Modrinth slugs, CurseForge slug or None, note)
@@ -87,7 +96,6 @@ PLAN = [
     ("settlement", "MineColonies", [], "245506", "open:town; NeoForge 1.21.1 builds are CurseForge-only"),
     ("settlement", "Stylecolonies", [], "827507", "13 community styles (High Magic, Steampunk, FairyTale...)"),
     ("settlement", "Byzantine Styles Pack", [], "974855", "Shogun, Nile, Byzantine"),
-    ("settlement", "SmallColonies ME", [], "1247027", "Littleton, Sandyton, decorations"),
     ("settlement", "Quark", ["quark"], "quark", "building blocks; overlapping features switched off"),
     ("settlement", "Villagers Reborn", ["villagers-reborn"], None, "human villagers with names, voices, dialogue (Oct 12)"),
     ("library", "Zeta", ["zeta"], None, "for Quark"),
@@ -212,6 +220,7 @@ PLAN = [
     ("glue", "Epic Fight Mod Compat", ["epic-fight-mod-compat"], None, ""),
     ("glue", "Epic Fight Weapons Compat", ["epic-fight-weapons-compat"], None, ""),
     ("glue", "Epic Tweaks", ["epic-tweaks"], None, "vanilla first person while holding a gun"),
+    ("glue", "JEI", ["jei"], "jei", "beside EMI, so JEI-only add-ons and plugins work"),
     # Epic Fight: Curios Compat Extended needs Epic Fight x Curios Compat, which is CurseForge-only; left out for now
     ("glue", "Sable: Physics Compat", ["sablecompat"], None, ""),
     ("glue", "Create Aeronautics: Compatibility", ["create-aeronautics-compatability"], None, ""),
@@ -283,6 +292,7 @@ def cf_lookup(slug):
     fid = str(f["id"])
     return {"title": d.get("title"), "source": "curseforge", "slug": slug, "version": f["display"],
             "filename": f["name"], "date": f["uploaded_at"][:10], "type": f.get("type"),
+            "cf_project": d.get("id"), "cf_file": f["id"],
             "url": f"https://mediafilez.forgecdn.net/files/{fid[:4]}/{int(fid[4:])}/{urllib.parse.quote(f['name'])}",
             "deps": []}
 
@@ -291,8 +301,9 @@ def mr_entry(proj, vs):
     v = vs[0]
     f = next((f for f in v["files"] if f["primary"]), v["files"][0])
     return {"title": proj["title"], "source": "modrinth", "slug": proj["slug"], "id": proj["id"],
-            "version": v["version_number"], "date": v["date_published"][:10], "type": v["version_type"],
-            "filename": f["filename"], "url": f["url"], "sha1": f["hashes"].get("sha1"),
+            "version": v["version_number"], "version_id": v["id"], "date": v["date_published"][:10],
+            "type": v["version_type"], "filename": f["filename"], "url": f["url"], "sha1": f["hashes"].get("sha1"),
+            "sha512": f["hashes"].get("sha512"),
             "client_side": proj.get("client_side"), "server_side": proj.get("server_side"),
             "deps": [{"project_id": d.get("project_id"), "version_id": d.get("version_id"),
                       "type": d["dependency_type"]} for d in v.get("dependencies", [])]}
@@ -303,6 +314,8 @@ def resolve(name, slugs, cf_slug):
         p = mr_project(s)
         if p:
             vs = mr_versions(p["id"])
+            if name in PINS:
+                vs = [v for v in vs if v["version_number"] == PINS[name][0]]
             if vs:
                 return mr_entry(p, vs)
     for hit in (mr_search(name) if slugs else []):
@@ -334,7 +347,7 @@ def main():
     while queue:
         d = queue.pop()
         pid = d.get("project_id")
-        if not pid or pid in seen_ids:
+        if not pid or pid in seen_ids or pid in IGNORE_DEPS:
             continue
         p = mr_project(pid)
         vs = mr_versions(pid) if p else []

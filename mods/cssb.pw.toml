@@ -1,0 +1,13 @@
+name = "Classic and Simple Status Bars"
+filename = "classicandsimplestatusbars-NeoForge-26.10.03.1.jar"
+side = "client"
+
+[download]
+url = "https://cdn.modrinth.com/data/rVTSwggw/versions/QewmaZik/classicandsimplestatusbars-NeoForge-26.10.03.1.jar"
+hash-format = "sha512"
+hash = "9e14d2995b5b7f26538cb363a7e2c5972bd32ab86ad1b8e5ef0ee5a6fe60cecf08bd1ad7b45e9b0b15733c5f3ff30c63a968d3b128805e5f61b9f15cd72f5bbe"
+
+[update]
+[update.modrinth]
+mod-id = "rVTSwggw"
+version = "QewmaZik"

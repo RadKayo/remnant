@@ -1,0 +1,13 @@
+name = "Epic Fight Weapons Compat"
+filename = "efweaponscompat-1.0.0.jar"
+side = "both"
+
+[download]
+url = "https://cdn.modrinth.com/data/Udv3YbH7/versions/B3Ks3QHg/efweaponscompat-1.0.0.jar"
+hash-format = "sha512"
+hash = "9bc33963e4c85c800f71e246a80fd82ebe98c980a37b5ed0e95c500190eeddf512748f14afa69bc7842e3c9659216298f8461dbbd7cc64cdf5cae2e87c92dd8b"
+
+[update]
+[update.modrinth]
+mod-id = "Udv3YbH7"
+version = "B3Ks3QHg"

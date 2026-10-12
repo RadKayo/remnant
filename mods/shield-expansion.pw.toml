@@ -1,0 +1,13 @@
+name = "Shield Expansion"
+filename = "shieldexp-neoforge-1.21.1-1.4.3.jar"
+side = "both"
+
+[download]
+url = "https://cdn.modrinth.com/data/sjxWxSao/versions/UC512VgT/shieldexp-neoforge-1.21.1-1.4.3.jar"
+hash-format = "sha512"
+hash = "312714e665285477adbd98e421227b15c97cbe50eb5bc156525b323c89a276b54d7606a848219fdc713db2602153dc02bf9caf11d389a49c4b8e596d508756bb"
+
+[update]
+[update.modrinth]
+mod-id = "sjxWxSao"
+version = "UC512VgT"

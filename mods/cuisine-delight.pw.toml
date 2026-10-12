@@ -1,0 +1,13 @@
+name = "Cuisine Delight"
+filename = "cuisinedelight-1.2.10.jar"
+side = "both"
+
+[download]
+url = "https://cdn.modrinth.com/data/gOQjCAAD/versions/gdWm3nOx/cuisinedelight-1.2.10.jar"
+hash-format = "sha512"
+hash = "43aacce13e0f70fd01f4577c24f0c3b231e23dbbcb1a2dd5cbeac01d3a5d9cad203d0e3b9c1aa87b28baebd283497dcbdf572688ee208a431542c2b18d4381e3"
+
+[update]
+[update.modrinth]
+mod-id = "gOQjCAAD"
+version = "gdWm3nOx"

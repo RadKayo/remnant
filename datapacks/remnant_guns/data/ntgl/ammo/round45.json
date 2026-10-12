@@ -1,0 +1,11 @@
+{
+ "type": "ntgl:energetic",
+ "damageType": "ntgl:energy",
+ "projectile": "ntgl:tesla",
+ "visible": true,
+ "magazineMode": false,
+ "damage": 20,
+ "size": 0.2,
+ "speed": 300,
+ "life": 1
+}

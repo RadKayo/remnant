@@ -1,0 +1,13 @@
+{
+ "type": "ntgl:laser",
+ "damageType": "ntgl:energy",
+ "projectile": "ntgl:laser",
+ "visible": true,
+ "magazineMode": true,
+ "damage": 10.0,
+ "size": 0.2,
+ "speed": 30,
+ "life": 5,
+ "spread": 10.0,
+ "projectileAmount": 6
+}

@@ -1,0 +1,13 @@
+name = "Cobblemon Mount Mastery"
+filename = "Cobblemon-mount-mastery-neoforge-0.4.2.jar"
+side = "both"
+
+[download]
+url = "https://cdn.modrinth.com/data/THkyAcSA/versions/CRcklDLL/Cobblemon-mount-mastery-neoforge-0.4.2.jar"
+hash-format = "sha512"
+hash = "e5cf378680f24479246b7b92447e0675d062c745ce4723799082ccd28106cdbe5b1763dbee629ed498b96159682940e798f3ae816fca34ab3a5ec79d88286e26"
+
+[update]
+[update.modrinth]
+mod-id = "THkyAcSA"
+version = "CRcklDLL"

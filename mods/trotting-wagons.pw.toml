@@ -1,0 +1,13 @@
+name = "Trotting Wagons"
+filename = "trotting_wagons-21.0.2.jar"
+side = "both"
+
+[download]
+url = "https://cdn.modrinth.com/data/X8CywXiK/versions/mpGWRAjg/trotting_wagons-21.0.2.jar"
+hash-format = "sha512"
+hash = "c272741ef216bf9132334c180899dd16e00b623ee193e50c5f7cb8d6e8ec2803ad4bc7f7faa172826169fded6b147c5b36bbb583a9398211a97d2a78123ef266"
+
+[update]
+[update.modrinth]
+mod-id = "X8CywXiK"
+version = "mpGWRAjg"

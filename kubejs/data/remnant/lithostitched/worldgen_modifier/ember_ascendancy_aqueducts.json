@@ -1,0 +1,11 @@
+{
+  "type": "lithostitched:set_pool_element_processors",
+  "template_pools": [
+    "ancient_remnants:aquaduct1/middle",
+    "ancient_remnants:aquaduct1/start_pool",
+    "ancient_remnants:aquaduct_older/middle",
+    "ancient_remnants:aquaduct_older/start_pool"
+  ],
+  "processor_list": "remnant:ascendancy_ruins_light",
+  "append": true
+}

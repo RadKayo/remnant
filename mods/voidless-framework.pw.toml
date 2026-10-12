@@ -1,0 +1,13 @@
+name = "Voidless Framework"
+filename = "voidlessframework-1.3.0-neoforge-1.21.1.jar"
+side = "both"
+
+[download]
+url = "https://cdn.modrinth.com/data/1PY6Y8vk/versions/keEQiyu7/voidlessframework-1.3.0-neoforge-1.21.1.jar"
+hash-format = "sha512"
+hash = "718ac8fda0da17115134e273b3e82dbebc254f99839773cd458fbcec45f6d798e058a7516d81d177fbc4e54e923b1ac7460e1629ee881725f09bff3d31ea8925"
+
+[update]
+[update.modrinth]
+mod-id = "1PY6Y8vk"
+version = "keEQiyu7"

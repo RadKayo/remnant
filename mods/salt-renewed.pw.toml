@@ -1,0 +1,13 @@
+name = "Salt: Renewed"
+filename = "salt-V1.0.0-Beta.jar"
+side = "both"
+
+[download]
+url = "https://cdn.modrinth.com/data/dQ91Cdnr/versions/w52wqhlp/salt-V1.0.0-Beta.jar"
+hash-format = "sha512"
+hash = "63bb5753bf949a39066efe9a4c036db5d1f90757d68caf9b75dff44b9997d3252979154164c25c275c2cd92b2d344ca836f8ee0024fe2111a7737330db6750e2"
+
+[update]
+[update.modrinth]
+mod-id = "dQ91Cdnr"
+version = "w52wqhlp"

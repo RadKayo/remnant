@@ -1,0 +1,13 @@
+name = "Applied Cooking"
+filename = "appliedcooking-6.2.1.jar"
+side = "both"
+
+[download]
+url = "https://cdn.modrinth.com/data/BmMjyidG/versions/dOeSwkkz/appliedcooking-6.2.1.jar"
+hash-format = "sha512"
+hash = "4f91bb92f5fbad090d4cfc233c54ddba45a50b2ca1b5d18bfab792dfc39a8b041c7bb759325bb62ac15893b2dc8713495ae892cbbaf5a52527de582942f5a726"
+
+[update]
+[update.modrinth]
+mod-id = "BmMjyidG"
+version = "dOeSwkkz"

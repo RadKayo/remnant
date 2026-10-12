@@ -1,0 +1,13 @@
+name = "Meal Mastery"
+filename = "mealmastery-neoforge-1.21.1-1.1.2.jar"
+side = "both"
+
+[download]
+url = "https://cdn.modrinth.com/data/up8htK5I/versions/HxK8UVWR/mealmastery-neoforge-1.21.1-1.1.2.jar"
+hash-format = "sha512"
+hash = "598ef9c0d6f29d7fc20b6cd61573a90ef89859281d73c8c72572509c77df5c54cafc6a4b0ad5e391a4ecca2964f320cfef58665ded4981ab091ec80e8e753300"
+
+[update]
+[update.modrinth]
+mod-id = "up8htK5I"
+version = "HxK8UVWR"

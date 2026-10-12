@@ -1,0 +1,13 @@
+name = "Villagers Reborn"
+filename = "villagersreborn-1.0.9b.jar"
+side = "both"
+
+[download]
+url = "https://cdn.modrinth.com/data/cS9I57mu/versions/Ea4sfqwp/villagersreborn-1.0.9b.jar"
+hash-format = "sha512"
+hash = "f70ad74cbb0f2b738ad4124d42165cfe00e0ec2ecf3c29638195c2db8b2242456d786dd5ebf5c258eb854106126be5b5508ee0f9027ca7c6796e3888104fbf80"
+
+[update]
+[update.modrinth]
+mod-id = "cS9I57mu"
+version = "Ea4sfqwp"

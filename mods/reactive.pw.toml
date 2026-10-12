@@ -1,0 +1,13 @@
+name = "Reactive"
+filename = "reactive-1.21.1-10.2.1.jar"
+side = "both"
+
+[download]
+url = "https://cdn.modrinth.com/data/soWqucCB/versions/z2C7ikEP/reactive-1.21.1-10.2.1.jar"
+hash-format = "sha512"
+hash = "c162cc35805235dacc5dadca423480f156f0e318a70fab2b31e91861d3dbcbdacbb50a5df0a5c123277ef13d49d07b321d9ce04fe46c48bf93f6bccf6f9277fb"
+
+[update]
+[update.modrinth]
+mod-id = "soWqucCB"
+version = "z2C7ikEP"

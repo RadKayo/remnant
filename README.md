@@ -12,7 +12,7 @@ A story-driven co-op survival adventure for Minecraft 1.21.1 on NeoForge, built 
 >
 > No grinding for bigger numbers. Just a broken world worth exploring, and a town worth defending.
 
-**Status:** in development. The design is settled and the pack is being built and tested. Nothing here is playable yet.
+**Status:** v0.1.0. All 262 mods install and boot on server and client, with the compatibility fixes, the reskinned ruins and the gun safety caps. The custom systems (the Ages, the stone-age start, the Grave Warden, bloodline powers, relics and quests) are next, so it isn't playable as Remnant yet.
 
 ## Design rules
 
@@ -48,7 +48,7 @@ The Twilight Forest, the Aether, the Undergarden, the Otherside, Eternal Starlig
 
 ## Playing
 
-Players install the pack once in Prism Launcher, and it updates itself on every launch. See [docs/players.md](docs/players.md).
+Players install the pack once in Prism Launcher, and it updates itself on every launch. See [docs/players.md](docs/players.md). For the server, see [docs/server.md](docs/server.md).
 
 ## Repository layout
 
@@ -57,24 +57,26 @@ Players install the pack once in Prism Launcher, and it updates itself on every 
 | `pack.toml`, `index.toml` | packwiz metadata: Minecraft 1.21.1, NeoForge, and the file index |
 | `mods/` | One `.pw.toml` per mod, pointing at its Modrinth or CurseForge download |
 | `config/`, `defaultconfigs/` | Mod configuration shipped with the pack |
-| `kubejs/` | Scripts for the custom systems: the stone-age start, Ages and schematics, waystone rebuilding, Remmings and more |
+| `kubejs/` | Scripts for the custom systems (coming), our textures over other mods' (Remming coins) and our datapacks in `kubejs/data` (generated, don't edit) |
+| `datapacks/` | Source of our datapacks: Ascendancy ruins, gun range caps (see its README) |
+| `tools/pack/` | `build.py` writes `mods/` from the audited list; `cap_guns.py` writes the gun caps |
+| `tools/citygen/` | The generator for Remainder, the city core (not shipped; its output goes on the server) |
 | `docs/` | Player and maintainer notes (not shipped to clients) |
 | `tools/compat/` | The compatibility audit: resolves the mod plan, checks dependencies and mixin overlaps (not shipped) |
 
 ## Maintaining
 
-The pack is managed with [packwiz](https://packwiz.infra.link/):
+The pack is managed with [packwiz](https://packwiz.infra.link/), but `mods/` is generated from the audited mod list rather than edited by hand:
 
-```bash
-packwiz modrinth add <slug>     # add a mod from Modrinth
-packwiz curseforge add <slug>   # add a mod from CurseForge
-packwiz update --all            # update everything
-packwiz refresh                 # rebuild index.toml after editing files by hand
-```
+1. Add or change the mod in the plan in `tools/compat/resolve.py`, then run the audit (resolve, download, analyze, check) in [`tools/compat`](tools/compat/README.md).
+2. `python3 tools/pack/build.py <compat>/data/resolved.json <compat>/jars` rewrites `mods/` and copies our datapacks and textures into `kubejs/`.
+3. `packwiz refresh` rebuilds `index.toml`. `config/DistantHorizons.toml` is marked `preserve = true` there, so players keep their own video settings, and refresh keeps that flag.
+4. Install the result into a scratch server and client with `packwiz serve` plus packwiz-installer, and boot both before pushing.
 
 Commit `index.toml` together with whatever changed, or clients will reject the update. Every change is tested on the test server before it reaches players.
 
 Before adding or updating mods, run the audit in [`tools/compat`](tools/compat/README.md). Two packwiz rules came out of it:
 
-- Some libraries are marked server-only on Modrinth but are needed on clients (SmartBrainLib, CodxLib, Lithostitched, Structure Pool API). Set `side = "both"` in their `.pw.toml`, or players crash on launch.
+- Sides: everything installs on both sides except mods Modrinth marks server-unsupported (rendering, HUD, tooltips), plus Epic Tweaks, which breaks a dedicated server. Libraries that Modrinth calls server-only still go on both sides (SmartBrainLib, CodxLib, Lithostitched, Structure Pool API). Ember's Ancient Remnants is server-only, because its author blocks automatic downloads and clients don't need it.
+- Iris is held at 1.8.14-beta.1, because 1.8.12 refuses Sodium 0.8.13.
 - Distant Horizons is pinned to 3.3.2 with its built-in updater turned off, until its Chunky crash is fixed.

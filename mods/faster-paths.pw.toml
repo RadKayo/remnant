@@ -1,0 +1,13 @@
+name = "Faster Paths"
+filename = "faster-paths-2.3.1-1.21.jar"
+side = "both"
+
+[download]
+url = "https://cdn.modrinth.com/data/dDo4Wd28/versions/gGmGw8xM/faster-paths-2.3.1-1.21.jar"
+hash-format = "sha512"
+hash = "f031b8522705c23b528ce624b26bb639e05b53f50d976152b77c8ba31f3f24a8219b1ec61a05ac6ae2798da02b899f92acc1c2eb895fc912e70a40147dc51b28"
+
+[update]
+[update.modrinth]
+mod-id = "dDo4Wd28"
+version = "gGmGw8xM"

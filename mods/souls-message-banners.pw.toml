@@ -1,0 +1,13 @@
+name = "Souls Message Banners"
+filename = "souls_message_banners-neoforge-1.2.2.jar"
+side = "both"
+
+[download]
+url = "https://cdn.modrinth.com/data/hx4Rlnhh/versions/YCx22XOV/souls_message_banners-neoforge-1.2.2.jar"
+hash-format = "sha512"
+hash = "a4428d9255a97d6ab5b819d8478c767455aab453fe5cbddd9b5e3b44f01fe8b970a3767b22f538fdae24191ff097860d2d326aa7677f321611f756e7d9a208b3"
+
+[update]
+[update.modrinth]
+mod-id = "hx4Rlnhh"
+version = "YCx22XOV"

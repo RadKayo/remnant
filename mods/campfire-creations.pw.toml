@@ -1,0 +1,13 @@
+name = "Campfire Creations"
+filename = "campfire_creations-1.0.1-for-neoforge-1.21.1.jar"
+side = "both"
+
+[download]
+url = "https://cdn.modrinth.com/data/DQXqVqpi/versions/5eI9YFfj/campfire_creations-1.0.1-for-neoforge-1.21.1.jar"
+hash-format = "sha512"
+hash = "df16634aa848e35f843758afa6ad6ba9f40dba3eb5d47d2af11b922b7f6899bb1b5ef4dfe729b3485768cd3c51f9a69dc351666aa15f3157e55f8145a4537d2c"
+
+[update]
+[update.modrinth]
+mod-id = "DQXqVqpi"
+version = "5eI9YFfj"

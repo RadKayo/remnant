@@ -11,6 +11,7 @@ Remnant updates itself: every time you launch, it checks this repository and dow
    "$INST_JAVA" -jar packwiz-installer-bootstrap.jar https://raw.githubusercontent.com/RadKayo/remnant/main/pack.toml
    ```
 
-5. Launch. The first start downloads everything; later starts only fetch what changed.
+5. In the instance settings, under **Settings → Java**, set **Maximum memory** to **6144 MB** (8192 MB if you have it). With about 260 mods, the game runs out of memory below 4 GB.
+6. Launch. The first start downloads about 1.5 GB of mods; later starts only fetch what changed. The first load takes a few minutes.
 
-If a mod is CurseForge-only and its author blocks third-party downloads, the installer will ask you to download that one file by hand and tell you where to put it.
+Nothing needs downloading by hand. One mod's author blocks automatic downloads, but it only builds ruins in the world, so it lives on the server alone.

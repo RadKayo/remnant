@@ -1,0 +1,13 @@
+name = "Goety"
+filename = "goety-3.2.0.jar"
+side = "both"
+
+[download]
+url = "https://cdn.modrinth.com/data/4ZVIxU8x/versions/8jB68vz3/goety-3.2.0.jar"
+hash-format = "sha512"
+hash = "bc2277f9dd22114d1aa8900a1ad145bd5cff4b935977a50d5bd8e6a38dc2ea9b2572f5ce535a1ee7e48240389c181743ecde4186d6dbd555ae12b34da8f0ce7f"
+
+[update]
+[update.modrinth]
+mod-id = "4ZVIxU8x"
+version = "8jB68vz3"
