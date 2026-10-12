@@ -1,2 +1,3 @@
 branding/.pylib/
 branding/fonts/*.ttf
+__pycache__/
