@@ -1,5 +1,6 @@
 // Remnant's own items. Textures: kubejs/assets/remnant/textures/item (drawn by branding/src/items.py).
-// Names: kubejs/assets/remnant/lang/en_us.json. Behaviour lives in server_scripts.
+// Names: kubejs/assets/remnant/lang/en_us.json. Behaviour lives in server_scripts, except the Hearthstone's
+// channelled use, which has to be defined with the item (hearthstone.js).
 
 StartupEvents.registry('item', event => {
   // The stone-age start
@@ -13,4 +14,8 @@ StartupEvents.registry('item', event => {
 
   // Salvage from the old world
   event.create('remnant:salvaged_circuitry')
+
+  // Wakes a dark waystone (server_scripts/travel.js)
+  event.create('remnant:relay_kit').maxStackSize(16).rarity('uncommon')
+    .tooltip(Text.of('Use on a dark waystone to wake it. The noise draws attention.').gray())
 })

@@ -22,6 +22,10 @@ file = "config/toughasnails/temperature.toml"
 hash = "3cba641f1b0c441b369ada5673bee301fcd9c90b4c8f2538b873724d63239c2c"
 
 [[files]]
+file = "config/waystones-common.toml"
+hash = "8652cb985dbc9d1c1c33c298cb0e467c6ccaccfee8a3fa532cd6e5a34c30b934"
+
+[[files]]
 file = "kubejs/assets/numismatics/textures/item/coin/bevel.png"
 hash = "2a07277820089fede97add2412de5a95ba8e1d644df855d3fc246ae63f32ff55"
 
@@ -51,7 +55,7 @@ hash = "7e4e29710f0d37e005efbb7ce0736ccca82a1da58c79ae99e205d86ea89a3bdd"
 
 [[files]]
 file = "kubejs/assets/remnant/lang/en_us.json"
-hash = "7075f0570aff1a503c7f31787ae2f01c28f2e87b81f2df3b3e03871cefa64cd2"
+hash = "a954238e87bef9b4544c94762c4d992250280250c74ca54ca7a31488b63676a3"
 
 [[files]]
 file = "kubejs/assets/remnant/textures/item/aegis_plate.png"
@@ -431,15 +435,27 @@ hash = "79a8fe197855853ed63b765130d240cbecc35d56fea8aceed3a98b3af316b5fd"
 
 [[files]]
 file = "kubejs/server_scripts/ages.js"
-hash = "79e0b71c787cf41c5e498a69b75e7dc58a1d80080d566bf6d934264ce050b13d"
+hash = "4d23391ff7cff45bf1f9b48ab9e8956433df7e8dd53d254744835fcb647b4e10"
+
+[[files]]
+file = "kubejs/server_scripts/guns.js"
+hash = "5dccaa968b63cbf9844b2ba11a7efb4956a50c441644c28922afae4f81329404"
 
 [[files]]
 file = "kubejs/server_scripts/stone_age.js"
-hash = "424621f915019c65062bbb7767dbfea4dabf16fd027a9228e891dd22c998166b"
+hash = "88a02d8b09ea614990dfccde642ad1713c49398fdae5d59e5c4518611f292383"
+
+[[files]]
+file = "kubejs/server_scripts/travel.js"
+hash = "f5632288e0bca629dafdc712cfb28eee84ee9c0ca2cd3d2921a76ef11dd32a4c"
+
+[[files]]
+file = "kubejs/startup_scripts/hearthstone.js"
+hash = "8e534a502d5ec39de9445694523c562332f13673e42748c6e222be9d32c478eb"
 
 [[files]]
 file = "kubejs/startup_scripts/remnant_items.js"
-hash = "726acd837c9258d71acbc65d989c4663ce3b4748c08b95f43c44dae7bb32ec23"
+hash = "64bccdcd3f3ed01152ebeef14dd17e687d7a51290daf27eb97e9ae15fac452e7"
 
 [[files]]
 file = "mods/ae2.pw.toml"

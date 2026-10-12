@@ -40,7 +40,7 @@ BlockEvents.rightClicked(event => {
   item.count--
   const shards = Math.random() < 0.7 ? 2 : 1
   player.give(Item.of('remnant:flint_shard', shards))
-  server.runCommandSilent(`playsound minecraft:block.stone.hit block @a ${block.x} ${block.y} ${block.z} 1 ${(0.8 + Math.random() * 0.4).toFixed(2)}`)
+  server.runCommandSilent(`execute in ${block.dimension} run playsound minecraft:block.stone.hit block @a ${block.x} ${block.y} ${block.z} 1 ${(0.8 + Math.random() * 0.4).toFixed(2)}`)
   event.cancel()
 })
 

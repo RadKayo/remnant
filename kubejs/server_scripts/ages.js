@@ -36,6 +36,7 @@ const LOCKS = {
       'cgs:revolver', 'cgs:shotgun', 'cgs:round_revolver', 'cgs:round_revolver_blank', 'cgs:round_shotgun',
       'cgs:round_shotgun_blank', 'cgs:round_shotgun_flechette', 'cgs:flintlock_long_barrel', 'cgs:flintlock_chambers',
       'cgs:blunderbuss_barrel', 'cgs:blunderbuss_barrel_long', 'cgs:scope',
+      'remnant:relay_kit',
     ],
   },
   3: {
