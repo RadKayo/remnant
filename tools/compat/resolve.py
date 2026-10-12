@@ -147,6 +147,8 @@ PLAN = [
     ("combat", "Combat Roll", ["combat-roll"], "combat-roll", ""),
     ("combat", "Shield Expansion", ["shield-expansion"], None, ""),
     ("combat", "Simply Swords", ["simply-swords"], "simply-swords", ""),
+    ("combat", "Create: Gunsmithing", ["cgs"], "create-gunsmithing", "guns from Age I, gated by Age (Oct 12)"),
+    ("combat", "NukaTeam's Gun Lib", ["ntgl"], None, "Gunsmithing's engine; our relic guns are NTGL gun packs"),
     ("combat", "Apotheosis", ["apotheosis"], "apotheosis", ""),
     ("combat", "Apothic Enchanting", ["apothic-enchanting"], "apothic-enchanting", ""),
     ("combat", "Artifacts", ["artifacts"], "artifacts", ""),
@@ -207,6 +209,7 @@ PLAN = [
     ("glue", "CombatEventFix", ["combateventfix"], None, "Epic Fight + Better Combat events"),
     ("glue", "Epic Fight Mod Compat", ["epic-fight-mod-compat"], None, ""),
     ("glue", "Epic Fight Weapons Compat", ["epic-fight-weapons-compat"], None, ""),
+    ("glue", "Epic Tweaks", ["epic-tweaks"], None, "vanilla first person while holding a gun"),
     # Epic Fight: Curios Compat Extended needs Epic Fight x Curios Compat, which is CurseForge-only; left out for now
     ("glue", "Sable: Physics Compat", ["sablecompat"], None, ""),
     ("glue", "Create Aeronautics: Compatibility", ["create-aeronautics-compatability"], None, ""),
